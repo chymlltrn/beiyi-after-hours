@@ -1,6 +1,6 @@
 {
-  "date": "2026-10-05T15:46:23.727Z",
-  "base": "http://127.0.0.1:8087/dist/index.html",
+  "date": "2026-10-05T15:57:05.300Z",
+  "base": "https://chymlltrn.github.io/beiyi-after-hours/",
   "passed": [
     "page initializes and renders canvas",
     "lab: select, play, destroy, restore",

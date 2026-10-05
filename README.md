@@ -2,6 +2,8 @@
 
 一个送给每天和小鼠打交道的北医博士的非官方解压小玩具。
 
+**[进入下班宇宙，开始解压 →](https://chymlltrn.github.io/beiyi-after-hours/)**
+
 ## 玩法
 
 - **实验室大拆迁**：点击实验室炸出碎片，累计十次，或者直接一键毁灭。
@@ -35,3 +37,13 @@ npm run build
 桌面和手机均可使用；互动画布支持点击、触摸、空格和回车。默认静音，开启后音效由 Web Audio 合成。自动遵循系统「减少动态效果」设置，后台标签页暂停 Canvas 动画。弹窗支持 Escape 关闭和重复体验。
 
 原创 Canvas 插画、原生 JavaScript 和 CSS，无外部字体、图片、追踪器或第三方运行依赖。
+
+## 浏览器验证
+
+`qa/browser-check.cjs` 使用外部提供的 Playwright 检查完整玩法、手机触摸、七种视口宽度、音效、碎纸机输入与呼吸计时。运行环境提供 Playwright 与浏览器后可执行：
+
+```sh
+node qa/browser-check.cjs
+```
+
+可选环境变量：`PLAYWRIGHT_PATH` 指定 Playwright 模块，`CHROME_PATH` 指定浏览器，`SITE_URL` 指定测试网址，`BROWSER_PROXY` 指定浏览器代理。`qa/verification.json` 和 `qa/visual-verdict.json` 保留检查结果。
