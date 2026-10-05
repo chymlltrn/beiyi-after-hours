@@ -1,0 +1,11 @@
+{
+  "score": 94,
+  "verdict": "pass",
+  "category_match": true,
+  "differences": [],
+  "suggestions": [],
+  "reasoning": "Desktop and mobile 390 and 320 are visually coherent; duplicate labels removed and secondary type readable.",
+  "threshold": 90,
+  "threshold_passed": true,
+  "next_actions": []
+}

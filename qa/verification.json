@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-05T15:46:23.727Z",
+  "base": "http://127.0.0.1:8087/dist/index.html",
+  "passed": [
+    "page initializes and renders canvas",
+    "lab: select, play, destroy, restore",
+    "mentor: select, play, destroy, restore",
+    "earth: select, play, destroy, restore",
+    "mice: select, play, destroy, restore",
+    "ten clicks automatically complete a session",
+    "empty vent validation and shred clears input safely",
+    "preset vent works",
+    "sound toggles explicitly",
+    "breathing starts, follows phases, completes and cancels",
+    "responsive sizes have no horizontal overflow",
+    "mobile touch and keyboard do not overflow",
+    "zero browser errors or failed asset requests"
+  ],
+  "errors": [],
+  "failedRequests": [],
+  "all_passed": true
+}

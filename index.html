@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c1012">
+  <meta name="description" content="给每天和小鼠打交道的北医博士：拆掉虚构实验室、粉碎导师语录、重启地球，然后好好休息。一个免费的互动解压小宇宙。">
+  <title>北医下班宇宙 · 今天，毁灭一下。</title>
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 19 19 5M5 5h14v14"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="m11 4-6 5H2v6h3l6 5zM16 8a6 6 0 0 1 0 8M19 5a10 10 0 0 1 0 14"/></symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24"><path d="m11 4-6 5H2v6h3l6 5zM17 9l5 6M22 9l-5 6"/></symbol>
+    <symbol id="i-lab" viewBox="0 0 48 48"><path d="M19 5h10m-8 0v14L9 37a4 4 0 0 0 3 6h24a4 4 0 0 0 3-6L27 19V5M16 28h16M31 12l3-6m3 13 7-2"/><circle cx="22" cy="34" r="2"/><path d="m15 11-6-3"/></symbol>
+    <symbol id="i-mentor" viewBox="0 0 48 48"><rect x="5" y="7" width="38" height="28" rx="4"/><path d="M17 43h14m-7-8v8M13 18h22M13 25h13m7-3 5 7m0-7-5 7"/></symbol>
+    <symbol id="i-earth" viewBox="0 0 48 48"><circle cx="24" cy="24" r="18"/><path d="m13 10 6 7-4 6 6 6-2 11M33 9l-5 8 7 7-4 5 4 6M5 37l8-3M38 6l5-3"/></symbol>
+    <symbol id="i-mouse" viewBox="0 0 48 48"><circle cx="11" cy="13" r="8"/><circle cx="37" cy="13" r="8"/><path d="M8 25C8 11 40 11 40 25c0 11-8 18-16 18S8 36 8 25Z"/><path d="m21 31 3 3 3-3m-3 3v4M4 27l10 2M34 29l10-2"/><circle cx="17" cy="25" r="1"/><circle cx="31" cy="25" r="1"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1 8M4 3v7h7"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20 4c-3-2-6 0-8 2-2-2-5-4-8-2-5 4 0 10 8 16 8-6 13-12 8-16Z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+  </svg>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+  <header class="header">
+    <a class="brand" href="#" aria-label="北医下班宇宙首页">
+      <span class="brand-mark"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="12" cy="13" r="9"/><circle cx="36" cy="13" r="9"/><ellipse cx="24" cy="28" rx="18" ry="16"/><path d="M14 24h8v6h-8zm12 0h8v6h-8zm-4 2h4"/><path d="m22 35 2 2 2-2"/></svg></span>
+      <span>北医<span class="brand-light">下班宇宙</span><small>AFTER HOURS CLUB</small></span>
+    </a>
+    <nav class="nav" aria-label="主导航"><a class="nav-active" href="#playground">解压游乐场</a><a href="#shredder">情绪碎纸机</a><a href="#rest">摸鱼急救站</a></nav>
+    <div class="header-tools"><span class="lab-status"><span class="status-dot"></span>实验室已下班</span><button id="sound-toggle" class="icon-button" aria-label="开启音效" aria-pressed="false" title="开启音效"><svg><use href="#i-mute"/></svg></button></div>
+  </header>
+  <main id="main">
+    <section class="hero section-wrap" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="tiny-cross">✳</span> 献给每天和小鼠打交道的你</div>
+        <h1 id="hero-title">今天，<br><span>毁灭一下。</span><svg class="title-spark" viewBox="0 0 70 70" aria-hidden="true"><path d="m35 2 5 24L60 9 47 30l22 5-22 5 13 21-20-17-5 24-5-24L10 61l13-21-22-5 22-5L10 9l20 17Z"/></svg></h1>
+        <p class="hero-description">实验没结果，导师有想法，小鼠有脾气。<br>没关系。先把这个宇宙拆了，再说。</p>
+        <div class="hero-ctas"><button class="button button-lime" id="start-button">开始发疯 <svg><use href="#i-arrow"/></svg></button><a class="text-link" href="#rest">今天只想躺平 <span>↗</span></a></div>
+        <div class="hero-note"><span class="note-line"></span><span>这里不需要阳性结果，只需要你开心。</span></div>
+        <div class="hero-stats"><div><strong id="total-release">00</strong><span>本次情绪已释放</span></div><span class="stat-divider"></span><div><strong>∞</strong><span>宇宙可以重来</span></div><span class="mini-mouse">小鼠：我也加入。<svg><use href="#i-mouse"/></svg></span></div>
+      </div>
+      <div class="universe-panel" id="universe-panel">
+        <div class="scene-header"><span><span class="status-dot"></span><span id="scene-name">实验室大拆迁</span></span><span class="scene-coordinate">PKUHSC · SECTOR 01</span></div>
+        <div class="canvas-wrap"><canvas id="universe" tabindex="0" role="button" aria-label="互动实验室，点击或按空格释放压力"></canvas><span class="orbit-label">你的精神状态，<br>在这里非常合理。</span><div class="scene-caption" id="scene-caption">点击任意位置 · 给压力一点颜色</div><span class="scene-sticker">100%<br><b>虚构破坏</b></span></div>
+        <div class="scene-bottom"><div class="pressure-label"><span id="pressure-label">压力释放进度</span><strong id="pressure-value">0%</strong></div><div class="pressure-track"><span id="pressure-fill"></span></div><div class="scene-actions"><button class="button button-scene" id="hit-button">释放一下 <span>↗</span></button><button class="button button-destroy" id="destroy-button"><span class="destruct-dot"></span>一键毁灭</button><button class="reset-button" id="reset-button" aria-label="恢复当前宇宙" title="恢复宇宙"><svg><use href="#i-reset"/></svg></button></div></div>
+      </div>
+    </section>
+    <div class="ticker" aria-hidden="true"><div>✳ 此刻，所有小鼠带薪休假 <span>·</span> P 值不定义你的价值 <span>·</span> 导师的消息可以等一下 <span>·</span> 毁灭完，记得喝水 <span>·</span> 今天的你已经很努力了 <span>·</span> 此刻，所有小鼠带薪休假 <span>·</span> P 值不定义你的价值 <span>·</span> 导师的消息可以等一下</div></div>
+    <section id="playground" class="playground section-wrap" aria-labelledby="playground-title">
+      <div class="section-heading"><div><div class="section-kicker">CHOOSE YOUR CHAOS</div><h2 id="playground-title">选一个世界，<span>随便发疯。</span></h2></div><p>四种解压方式。零次伦理申请。<br>所有破坏都发生在这个虚构小宇宙。</p></div>
+      <div class="mode-grid">
+        <button class="mode-card active" data-mode="lab" aria-pressed="true"><div class="card-top"><span class="card-number">01 / LAB</span><svg class="card-arrow"><use href="#i-arrow"/></svg></div><svg class="mode-icon"><use href="#i-lab"/></svg><h3>实验室大拆迁</h3><p>移液枪、离心机、跑不出来的胶。<br>今天统统送它们上天。</p><span class="card-bottom"><span>物理解压 · 点击爆破</span><span class="mode-indicator">正在体验 ↗</span></span></button>
+        <button class="mode-card" data-mode="mentor" aria-pressed="false"><div class="card-top"><span class="card-number">02 / BOSS</span><svg class="card-arrow"><use href="#i-arrow"/></svg></div><svg class="mode-icon"><use href="#i-mentor"/></svg><h3>导师语录粉碎机</h3><p>“这个很简单，再补一组。”<br>收到。已送入宇宙黑洞。</p><span class="card-bottom"><span>精神解压 · 粉碎语录</span><span class="mode-indicator">进入 ↗</span></span></button>
+        <button class="mode-card" data-mode="earth" aria-pressed="false"><div class="card-top"><span class="card-number">03 / EARTH</span><svg class="card-arrow"><use href="#i-arrow"/></svg></div><svg class="mode-icon"><use href="#i-earth"/></svg><h3>地球重启计划</h3><p>如果问题太多，<br>那就把问题所在的星球重启。</p><span class="card-bottom"><span>终极解压 · 行星爆炸</span><span class="mode-indicator">进入 ↗</span></span></button>
+        <button class="mode-card" data-mode="mice" aria-pressed="false"><div class="card-top"><span class="card-number">04 / MICE</span><svg class="card-arrow"><use href="#i-arrow"/></svg></div><svg class="mode-icon"><use href="#i-mouse"/></svg><h3>小鼠罢工派对</h3><p>不做实验了，今天鼠鼠当导师。<br>你负责摸鱼，它负责蹦迪。</p><span class="card-bottom"><span>快乐解压 · 全员放假</span><span class="mode-indicator">进入 ↗</span></span></button>
+      </div>
+    </section>
+    <section class="shredder-section section-wrap" id="shredder" aria-labelledby="shredder-title">
+      <div class="shredder-copy"><div class="section-kicker">LEAVE IT HERE</div><h2 id="shredder-title">有些话，<br>不用憋着。</h2><p>写下今天最想吐槽的事。<br>然后看它碎成一场宇宙烟花。</p><span class="privacy-note"><span class="status-dot"></span>只在当前页面处理 · 不保存 · 不上传</span></div>
+      <div class="shredder-machine"><div class="machine-label"><span>情绪碎纸机 / EMOTION SHREDDER</span><span>READY ●</span></div><form id="shredder-form"><label class="sr-only" for="vent-input">写下想粉碎的压力</label><textarea id="vent-input" maxlength="240" placeholder="比如：谁发明了周五下午五点的组会……" rows="3"></textarea><div class="shredder-meta"><span id="character-count">0 / 240</span><span>放心，这里没有导师。</span></div><div class="prompt-chips"><button type="button" data-prompt="再补一组实验，下周就要。">再补一组实验</button><button type="button" data-prompt="我的 Western blot 又是一片雪花。">WB 又翻车了</button><button type="button" data-prompt="Reviewer 2，你真的没有自己的生活吗？">Reviewer 2</button></div><button class="button shred-button" type="submit"><span>粉碎它，让我下班</span><svg><use href="#i-arrow"/></svg></button></form><div class="shredder-output" id="shredder-output" role="status" aria-live="polite"></div></div>
+    </section>
+    <section class="rest-section section-wrap" id="rest" aria-labelledby="rest-title">
+      <div class="rest-heading"><div class="section-kicker">YOU ARE MORE THAN YOUR DATA</div><h2 id="rest-title">宇宙毁灭完了。<br>现在，照顾一下你。</h2><p>你不是一台 24 小时运转的 PCR 仪。<br>给自己一个不需要解释的暂停。</p></div>
+      <div class="breathing-card"><span class="breathing-label">60 秒 · 摸鱼急救</span><div class="breathing-orbit" id="breathing-orbit"><div class="breathing-core"><svg><use href="#i-heart"/></svg><span id="breathing-instruction">慢下来</span></div></div><p id="breathing-status">实验可以等，先呼吸一下。</p><button class="button breathing-button" id="breathing-button">陪我呼吸一分钟 <span>↗</span></button></div>
+    </section>
+    <div class="closing-note section-wrap"><span>✳</span><p>阴性结果不是失败。<br><strong>你今天来到这里，就已经值得一场小小的庆祝。</strong></p><svg><use href="#i-mouse"/></svg></div>
+  </main>
+  <footer class="footer section-wrap"><a class="footer-brand" href="#">北医下班宇宙 <span>AFTER HOURS CLUB</span></a><p>一个送给北医博士的非官方解压小玩具。<br>角色与场景均为虚构，鼠鼠们全员平安下班。</p><span class="footer-sign">MADE WITH ♡ & A LITTLE CHAOS</span></footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <dialog id="completion-dialog"><div class="completion-icon">✳</div><span class="section-kicker">MISSION: ACCOMPLISHED</span><h2 id="completion-title">实验室已飞出太阳系。</h2><p id="completion-message">实验记录没丢，小鼠已经度假。<br>现在，世界安静了。你可以休息一下。</p><div class="completion-buttons"><button class="button button-lime" id="again-button">再毁灭一次 <svg><use href="#i-reset"/></svg></button><button class="text-link" id="rest-button">去躺一会儿 ↗</button></div><button class="dialog-close" id="dialog-close" aria-label="关闭庆祝窗口">×</button></dialog>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
