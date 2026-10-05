@@ -12,6 +12,6 @@ const standalone = html
   .replace('href="./assets/favicon.svg"', `href="data:image/svg+xml,${encodeURIComponent(favicon)}"`)
   .replace('<script type="module" src="./app.js"></script>', `<script type="module">\n${bundledScript.replace(/<\/script/gi, '<\\/script')}\n</script>`);
 await writeFile(destination + '/index.html', standalone);
-await writeFile(destination + '/README.md', readme + '\n## GitHub Pages distribution\n\nThis repository contains the complete self-contained website in `index.html`. Its CSS, Canvas artwork and JavaScript are embedded so it also works as a single file with no build or dependencies. Enable Pages from the `main` branch, repository root. The modular development version is maintained locally.\n');
+await writeFile(destination + '/README.md', readme + '\n## Offline distribution\n\nThis folder contains the complete self-contained website in `index.html`. Its CSS, Canvas artwork and JavaScript are embedded so it works as a single file without a server or dependencies. The repository root keeps the modular source and is published by GitHub Pages.\n');
 await writeFile(destination + '/.nojekyll', '');
 console.log('Self-contained static site built in dist/index.html. No runtime dependencies.');

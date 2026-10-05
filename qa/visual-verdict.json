@@ -1,11 +1,8 @@
 {
-  "score": 94,
+  "score": 95,
   "verdict": "pass",
   "category_match": true,
   "differences": [],
   "suggestions": [],
-  "reasoning": "Desktop and mobile 390 and 320 are visually coherent; duplicate labels removed and secondary type readable.",
-  "threshold": 90,
-  "threshold_passed": true,
-  "next_actions": []
+  "reasoning": "在上一轮四模式桌面与手机、两张整页及六张动态状态共 16 幅截图的审查基础上，复核两张最终修订图。桌面结果电脑名称已与底座分离，手机派对结束文案只保留一层；完整场景、主体文字、模式区分及拖拽、蓄力、派对、碎纸反馈清楚，未发现剩余的可执行视觉缺陷。"
 }

@@ -1,22 +1,69 @@
 {
-  "date": "2026-10-05T15:57:05.300Z",
-  "base": "https://chymlltrn.github.io/beiyi-after-hours/",
+  "date": "2026-10-05T16:43:58.265Z",
+  "base": "http://127.0.0.1:8087/",
+  "version": 2,
   "passed": [
-    "page initializes and renders canvas",
-    "lab: select, play, destroy, restore",
-    "mentor: select, play, destroy, restore",
-    "earth: select, play, destroy, restore",
-    "mice: select, play, destroy, restore",
-    "ten clicks automatically complete a session",
-    "empty vent validation and shred clears input safely",
-    "preset vent works",
-    "sound toggles explicitly",
-    "breathing starts, follows phases, completes and cancels",
-    "responsive sizes have no horizontal overflow",
-    "mobile touch and keyboard do not overflow",
-    "zero browser errors or failed asset requests"
+    "page renders four distinct plays and a usable canvas",
+    "laboratory equipment responds to a real mouse fling with a bonus",
+    "mentor messages drag away and all three reply tools accept input",
+    "twelve creative tools work and three intensity choices accept selection",
+    "lab: scene result, optional dialog and repeat play",
+    "mentor: scene result, optional dialog and repeat play",
+    "earth: scene result, optional dialog and repeat play",
+    "mice: scene result, optional dialog and repeat play",
+    "six lab objects and five mentor messages complete naturally",
+    "earth taps add progress and a real canvas hold unloads the planet",
+    "earth charge button and held keyboard release a full charge",
+    "cancelled pointer and escaped charge never accidentally destroy a scene",
+    "a second pointer or unrelated key cannot release somebody else’s charge",
+    "mouse beat doubles joy and fast actions make a combo that expires",
+    "keyboard play, immersive escape and optional celebration preserve control",
+    "shredder validates empty input, clears private text and never executes markup",
+    "sound is opt-in and a personalized after-hours permit can be collected",
+    "layout fits widths 320 through 1440 without sideways scrolling",
+    "60-second breathing follows inhale/exhale, finishes and cancels",
+    "phone touch plays, switches modes, completes and returns to rest",
+    "four animated scenes react and burst, and the offline file plays every mode",
+    "fresh desktop, mobile and four scene screenshots are saved for review",
+    "zero browser errors, unexpected dialogs or failed asset requests"
+  ],
+  "imageChanges": [
+    {
+      "mode": "lab",
+      "before": "8494a1286ce28c9cac4b325f66e1d463177c58122d353a257d21b55879fa0d6a",
+      "hit": "8bf2936f187b7754eae1e4596fbb606d83a0de8455150d6cc4ca7d00ad761afa",
+      "burst": "dcb38e1f94a9d9e37b2149838e197d6f16e34301c4db32fddadf1ddd325fec92"
+    },
+    {
+      "mode": "mentor",
+      "before": "03eaf3920f81539827c9ab6f3c4d56d7db45ba01e546fe486f70c06e24a9ddf8",
+      "hit": "1bdda5b215be9717d2a4bc95923529f7c638a042c2562ff38627b9cc99ee01e7",
+      "burst": "eaa0199c1836ecd5fdb77d9b51de4778370ac9d23acbedf50d40ed9cac103016"
+    },
+    {
+      "mode": "earth",
+      "before": "8543ef920d457763ed467ea9e349ea674cdfbc7bb57b32b1daeb98da9f0f041b",
+      "hit": "b6c6b6564af80da70377a057d1f954742007ea83d7e1814384c28b0aa66e0c06",
+      "burst": "7860d045537ebf7b6371c96223ae70a11739766ba6916bb9515473730130d174"
+    },
+    {
+      "mode": "mice",
+      "before": "c24c9738764419c922b5c42e30915a244fdfa505468504a9394eab1d8848125c",
+      "hit": "aeb947cd53ed5c7d2e3f4f637adceccf74e8436a4221aa3f18f9737ac5f2c64d",
+      "burst": "6968c0a4f6b1fe3f8ab67538d39b7563a044b31bc6cbcef359b88a4cd5824148"
+    }
   ],
   "errors": [],
   "failedRequests": [],
-  "all_passed": true
+  "unexpectedDialogs": [],
+  "all_passed": true,
+  "finalVisualFixChecks": {
+    "date": "2026-10-05T16:49:14.766181+00:00",
+    "passed": [
+      "desktop result-computer label captured clear of base",
+      "mobile ending uses a single caption and replays",
+      "rebuilt offline file completes and replays all four worlds"
+    ],
+    "errors": []
+  }
 }
