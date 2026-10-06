@@ -1,13 +1,13 @@
 {
   "name": "beiyi-after-hours",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
   "type": "module",
-  "description": "An unofficial, playful stress-relief universe for PKUHSC PhD students.",
+  "description": "A gentle, playful stress-relief universe for PhD students, doctors and teachers.",
   "scripts": {
     "dev": "node scripts/serve.mjs",
     "build": "node scripts/build.mjs",
-    "check": "node --check app.js && node --check assets/universe.js && node --check scripts/serve.mjs && node --check scripts/build.mjs"
+    "check": "node --check app.js && node --check assets/personas.js && node --check assets/universe.js && node --check scripts/serve.mjs && node --check scripts/build.mjs"
   },
   "engines": { "node": ">=18" }
 }

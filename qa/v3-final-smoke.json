@@ -1,0 +1,110 @@
+{
+  "date": "2026-10-06T02:23:10.521Z",
+  "base": "http://127.0.0.1:8087/",
+  "version": 3,
+  "scope": "Final CSS and wording smoke after the 38-check browser suite",
+  "passedCount": 11,
+  "passed": [
+    "width 320: responsive layout has no horizontal overflow",
+    "width 375: responsive layout has no horizontal overflow",
+    "width 390: responsive layout has no horizontal overflow",
+    "width 600: responsive layout has no horizontal overflow",
+    "width 768: responsive layout has no horizontal overflow",
+    "width 1024: responsive layout has no horizontal overflow",
+    "width 1440: responsive layout has no horizontal overflow",
+    "phd: planet blast stays visible, completes and replays",
+    "doctor: planet blast stays visible, completes and replays",
+    "teacher: planet blast stays visible, completes and replays",
+    "offline single file switches all three roles and completes a scene"
+  ],
+  "viewports": [
+    {
+      "width": 320,
+      "documentWidth": 320,
+      "bodyWidth": 320,
+      "impactFontPx": 19,
+      "impactX": 36,
+      "impactRight": 148.203125
+    },
+    {
+      "width": 375,
+      "documentWidth": 375,
+      "bodyWidth": 375,
+      "impactFontPx": 19,
+      "impactX": 36,
+      "impactRight": 148.203125
+    },
+    {
+      "width": 390,
+      "documentWidth": 390,
+      "bodyWidth": 390,
+      "impactFontPx": 19,
+      "impactX": 36,
+      "impactRight": 148.203125
+    },
+    {
+      "width": 600,
+      "documentWidth": 600,
+      "bodyWidth": 600,
+      "impactFontPx": 19,
+      "impactX": 41,
+      "impactRight": 153.203125
+    },
+    {
+      "width": 768,
+      "documentWidth": 768,
+      "bodyWidth": 768,
+      "impactFontPx": 26,
+      "impactX": 53,
+      "impactRight": 207.203125
+    },
+    {
+      "width": 1024,
+      "documentWidth": 1024,
+      "bodyWidth": 1024,
+      "impactFontPx": 26,
+      "impactX": 53,
+      "impactRight": 207.203125
+    },
+    {
+      "width": 1440,
+      "documentWidth": 1440,
+      "bodyWidth": 1440,
+      "impactFontPx": 26,
+      "impactX": 107,
+      "impactRight": 261.203125
+    }
+  ],
+  "earthRoles": [
+    {
+      "persona": "phd",
+      "elapsedMs": 2699,
+      "burst": true,
+      "completed": true,
+      "replayed": true
+    },
+    {
+      "persona": "doctor",
+      "elapsedMs": 2689,
+      "burst": true,
+      "completed": true,
+      "replayed": true
+    },
+    {
+      "persona": "teacher",
+      "elapsedMs": 2689,
+      "burst": true,
+      "completed": true,
+      "replayed": true
+    }
+  ],
+  "offlineRoles": [
+    "phd",
+    "doctor",
+    "teacher"
+  ],
+  "errors": [],
+  "failedRequests": [],
+  "unexpectedDialogs": [],
+  "all_passed": true
+}

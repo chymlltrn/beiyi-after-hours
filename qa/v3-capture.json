@@ -1,0 +1,269 @@
+{
+  "records": [
+    {
+      "role": "phd",
+      "mode": "lab",
+      "width": 1440,
+      "targetMs": 200,
+      "actualMs": 295,
+      "phase": "burst"
+    },
+    {
+      "role": "phd",
+      "mode": "lab",
+      "width": 1440,
+      "targetMs": 700,
+      "actualMs": 785,
+      "phase": "burst"
+    },
+    {
+      "role": "phd",
+      "mode": "earth",
+      "width": 1440,
+      "targetMs": 200,
+      "actualMs": 288,
+      "phase": "burst"
+    },
+    {
+      "role": "phd",
+      "mode": "earth",
+      "width": 1440,
+      "targetMs": 700,
+      "actualMs": 796,
+      "phase": "burst"
+    },
+    {
+      "role": "phd",
+      "mode": "earth",
+      "width": 1440,
+      "targetMs": 1500,
+      "actualMs": 1617,
+      "phase": "burst"
+    },
+    {
+      "role": "phd",
+      "mode": "earth",
+      "width": 1440,
+      "targetMs": 2400,
+      "actualMs": 2499,
+      "phase": "burst"
+    },
+    {
+      "role": "doctor",
+      "mode": "lab",
+      "width": 1440,
+      "targetMs": 200,
+      "actualMs": 306,
+      "phase": "burst"
+    },
+    {
+      "role": "doctor",
+      "mode": "lab",
+      "width": 1440,
+      "targetMs": 700,
+      "actualMs": 812,
+      "phase": "burst"
+    },
+    {
+      "role": "doctor",
+      "mode": "earth",
+      "width": 1440,
+      "targetMs": 200,
+      "actualMs": 304,
+      "phase": "burst"
+    },
+    {
+      "role": "doctor",
+      "mode": "earth",
+      "width": 1440,
+      "targetMs": 700,
+      "actualMs": 797,
+      "phase": "burst"
+    },
+    {
+      "role": "doctor",
+      "mode": "earth",
+      "width": 1440,
+      "targetMs": 1500,
+      "actualMs": 1601,
+      "phase": "burst"
+    },
+    {
+      "role": "doctor",
+      "mode": "earth",
+      "width": 1440,
+      "targetMs": 2400,
+      "actualMs": 2499,
+      "phase": "burst"
+    },
+    {
+      "role": "teacher",
+      "mode": "lab",
+      "width": 1440,
+      "targetMs": 200,
+      "actualMs": 288,
+      "phase": "burst"
+    },
+    {
+      "role": "teacher",
+      "mode": "lab",
+      "width": 1440,
+      "targetMs": 700,
+      "actualMs": 784,
+      "phase": "burst"
+    },
+    {
+      "role": "teacher",
+      "mode": "earth",
+      "width": 1440,
+      "targetMs": 200,
+      "actualMs": 304,
+      "phase": "burst"
+    },
+    {
+      "role": "teacher",
+      "mode": "earth",
+      "width": 1440,
+      "targetMs": 700,
+      "actualMs": 799,
+      "phase": "burst"
+    },
+    {
+      "role": "teacher",
+      "mode": "earth",
+      "width": 1440,
+      "targetMs": 1500,
+      "actualMs": 1602,
+      "phase": "burst"
+    },
+    {
+      "role": "teacher",
+      "mode": "earth",
+      "width": 1440,
+      "targetMs": 2400,
+      "actualMs": 2504,
+      "phase": "burst"
+    },
+    {
+      "role": "phd",
+      "mode": "lab",
+      "width": 390,
+      "targetMs": 700,
+      "actualMs": 766,
+      "phase": "burst"
+    },
+    {
+      "role": "phd",
+      "mode": "earth",
+      "width": 390,
+      "targetMs": 200,
+      "actualMs": 263,
+      "phase": "burst"
+    },
+    {
+      "role": "phd",
+      "mode": "earth",
+      "width": 390,
+      "targetMs": 700,
+      "actualMs": 773,
+      "phase": "burst"
+    },
+    {
+      "role": "phd",
+      "mode": "earth",
+      "width": 390,
+      "targetMs": 1500,
+      "actualMs": 1572,
+      "phase": "burst"
+    },
+    {
+      "role": "phd",
+      "mode": "earth",
+      "width": 390,
+      "targetMs": 2400,
+      "actualMs": 2476,
+      "phase": "burst"
+    },
+    {
+      "role": "doctor",
+      "mode": "lab",
+      "width": 390,
+      "targetMs": 700,
+      "actualMs": 748,
+      "phase": "burst"
+    },
+    {
+      "role": "doctor",
+      "mode": "earth",
+      "width": 390,
+      "targetMs": 200,
+      "actualMs": 260,
+      "phase": "burst"
+    },
+    {
+      "role": "doctor",
+      "mode": "earth",
+      "width": 390,
+      "targetMs": 700,
+      "actualMs": 761,
+      "phase": "burst"
+    },
+    {
+      "role": "doctor",
+      "mode": "earth",
+      "width": 390,
+      "targetMs": 1500,
+      "actualMs": 1562,
+      "phase": "burst"
+    },
+    {
+      "role": "doctor",
+      "mode": "earth",
+      "width": 390,
+      "targetMs": 2400,
+      "actualMs": 2473,
+      "phase": "burst"
+    },
+    {
+      "role": "teacher",
+      "mode": "lab",
+      "width": 390,
+      "targetMs": 700,
+      "actualMs": 752,
+      "phase": "burst"
+    },
+    {
+      "role": "teacher",
+      "mode": "earth",
+      "width": 390,
+      "targetMs": 200,
+      "actualMs": 253,
+      "phase": "burst"
+    },
+    {
+      "role": "teacher",
+      "mode": "earth",
+      "width": 390,
+      "targetMs": 700,
+      "actualMs": 747,
+      "phase": "burst"
+    },
+    {
+      "role": "teacher",
+      "mode": "earth",
+      "width": 390,
+      "targetMs": 1500,
+      "actualMs": 1564,
+      "phase": "burst"
+    },
+    {
+      "role": "teacher",
+      "mode": "earth",
+      "width": 390,
+      "targetMs": 2400,
+      "actualMs": 2447,
+      "phase": "burst"
+    }
+  ],
+  "errors": []
+}

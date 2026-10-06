@@ -1,41 +1,10 @@
-import { Universe } from './assets/universe.js';
+import { Universe } from './assets/universe.js?v=3';
+import { PERSONAS } from './assets/personas.js?v=3';
 
 const $ = (selector) => document.querySelector(selector);
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-const modes = {
-  lab: {
-    name: '实验室拆迁办', number: '01', goal: 6, unit: '件仪器已起飞', badge: '营业中 · 全部拆迁',
-    description: '移液枪、离心机、跑不出来的胶。把今天的实验现场，甩出太阳系。',
-    instruction: '抓住仪器，拖动后松手甩飞。也可以直接点着砸。', hit: '砸飞一件', ultimate: '实验室原地起飞', charge: '按住 · 启动反重力',
-    tools: [['hammer', '↘', '下班大锤'], ['gravity', '◎', '反重力场'], ['rainbow', '✺', '彩虹溶解液']],
-    hits: ['离心机：这次真的离心了。', '移液枪，送你一个无薪飞行。', '阴性结果留着，坏心情飞走。', '试剂盒已加入星际快递。', 'PCR：扩增快乐，不扩增加班。', '实验台：本台宣布提前退休。'],
-    title: '实验室，已发射。', message: '实验记录平安，小鼠坐上逃生火箭。\n今天不用补实验，只补一觉。', score: 180,
-  },
-  mentor: {
-    name: '导师消息退订台', number: '02', goal: 5, unit: '条消息已退订', badge: '自动回复 · 本人已下班',
-    description: '“这个很简单，再补一组。”选择粉碎、静音或礼貌回怼，把自己的时间拿回来。',
-    instruction: '抓住消息拖进黑洞。换个工具，还能静音或回怼。', hit: '退订一条', ultimate: '拒收全部加班消息', charge: '按住 · 开启免打扰',
-    tools: [['shred', '≋', '语录碎纸机'], ['mute', '⊘', '宇宙免打扰'], ['reply', '↗', '礼貌回怼']],
-    hits: ['「再补一组」→ 收到，我先下班。', '「周末来一下」→ 周末已被我预约。', '「这个很简单」→ 那您一定很擅长。', '「投个顶刊」→ 先投一张休假申请。', '「结果呢？」→ 我的人生也需要结果。'],
-    title: '您已退出加班群聊。', message: '所有「再补一组」已被宇宙拒收。\n自动回复：正在生活，稍后上线。', score: 220,
-  },
-  earth: {
-    name: '地球卸载程序', number: '03', goal: 100, unit: '卸载进度', badge: '程序：地球.exe · 响应过载',
-    description: '组会、DDL、Reviewer 2 都在这颗星球上。太卡了？那就卸载，重新安装一个。',
-    instruction: '按住星球约 2.4 秒蓄力，松手释放。点击也能召唤陨石。', hit: '来一颗陨石', ultimate: '立即卸载地球', charge: '按住 · 蓄力卸载地球',
-    tools: [['meteor', '☄', 'DDL 陨石'], ['laser', '⌁', '审稿人激光'], ['blackhole', '◉', '一键格式化']],
-    hits: ['DDL 已经失去引力。', '组会所在的经线正在松动。', 'Reviewer 2：服务器连接失败。', '正在删除「无限返修」文件夹。', '地球内存终于留给了睡眠。'],
-    title: '新地球，安装完成。', message: '已删除：凌晨组会、无限返修、无效加班。\n已保留：你、好好睡觉、快乐的小鼠。', score: 80,
-  },
-  mice: {
-    name: '鼠鼠篡位俱乐部', number: '04', goal: 12, unit: '份快乐已扩增', badge: '133 BPM · 快乐不做对照组',
-    description: '今天鼠鼠当导师，你负责蹦迪。踩准节拍，越敲越热闹，全员带薪休假。',
-    instruction: '跟着节奏连续点击舞池。约半秒一下，踩准节拍快乐翻倍。', hit: '给鼠鼠打个拍', ultimate: '全员带薪开趴', charge: '按住 · 掀起派对高潮',
-    tools: [['disco', '♫', '鼠鼠 DJ'], ['bubbles', '○', '汽水泡泡'], ['snacks', '✦', '零食空投']],
-    hits: ['鼠鼠一号：取消今天的实验。', '动物房改名：北医地下舞厅。', '鼠鼠：这次由你当快乐实验组。', '小鼠已批准你的带薪摸鱼。', '快乐不显著？再来一个节拍！'],
-    title: '鼠鼠宣布：全员下班！', message: '没有对照组，只有快乐组。\n今天我们全体通过「好好生活」伦理审批。', score: 120,
-  },
-};
+let persona = 'phd';
+let modes = PERSONAS[persona].modes;
 
 let mode = 'lab';
 let tool = 'hammer';
@@ -58,7 +27,6 @@ let chargeTimer;
 let comboTimer;
 let impactTimer;
 let toastTimer;
-let completionTimer;
 let breathingTimer;
 let breathingRunning = false;
 let breathingStartedAt = 0;
@@ -66,7 +34,7 @@ let breathingPausedAt = 0;
 let breathingPausedDuration = 0;
 let shredTimer;
 let shredding = false;
-const universe = new Universe($('#universe'), { reducedMotion: reducedMotion.matches });
+const universe = new Universe($('#universe'), { reducedMotion: reducedMotion.matches, onComplete: finishBurst });
 
 function toast(message) {
   clearTimeout(toastTimer);
@@ -83,19 +51,42 @@ function tone(type = 'hit', power = 1) {
     audioContext ??= new Audio();
     if (audioContext.state === 'suspended') audioContext.resume().catch(() => {});
     const now = audioContext.currentTime;
+    if (type === 'burst') {
+      const body = audioContext.createGain();
+      body.gain.setValueAtTime(.001, now);
+      body.gain.exponentialRampToValueAtTime(.15, now + .018);
+      body.gain.exponentialRampToValueAtTime(.001, now + 1.25);
+      body.connect(audioContext.destination);
+      const bass = audioContext.createOscillator();
+      bass.type = 'sine'; bass.frequency.setValueAtTime(140, now);
+      bass.frequency.exponentialRampToValueAtTime(30, now + .75);
+      bass.connect(body); bass.start(now); bass.stop(now + 1.3);
+      const buffer = audioContext.createBuffer(1, Math.floor(audioContext.sampleRate * 1.8), audioContext.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 1.7);
+      for (const [delay, volume, cutoff] of [[0, .09, 1800], [.14, .045, 600]]) {
+        const noise = audioContext.createBufferSource(); noise.buffer = buffer;
+        const filter = audioContext.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = cutoff;
+        const echo = audioContext.createGain(); echo.gain.setValueAtTime(volume, now + delay);
+        echo.gain.exponentialRampToValueAtTime(.001, now + delay + 1.8);
+        noise.connect(filter); filter.connect(echo); echo.connect(audioContext.destination);
+        noise.start(now + delay); noise.stop(now + delay + 1.85);
+      }
+      return;
+    }
     const gain = audioContext.createGain();
-    const duration = type === 'burst' ? .8 : type === 'charge' ? .1 : .22;
+    const duration = type === 'charge' ? .1 : .22;
     gain.gain.setValueAtTime(.001, now);
     gain.gain.exponentialRampToValueAtTime(Math.min(.13, .035 + power * .02), now + .012);
     gain.gain.exponentialRampToValueAtTime(.001, now + duration);
     gain.connect(audioContext.destination);
     const osc = audioContext.createOscillator();
-    const frequency = type === 'shred' ? 700 : type === 'burst' ? 150 : { lab: 125, mentor: 460, earth: 82, mice: [262, 330, 392, 523][combo % 4] }[mode];
+    const frequency = type === 'shred' ? 700 : { lab: 125, mentor: 460, earth: 82, mice: [262, 330, 392, 523][combo % 4] }[mode];
     osc.type = mode === 'mice' ? 'triangle' : mode === 'mentor' ? 'sine' : 'sawtooth';
     osc.frequency.setValueAtTime(frequency, now);
-    osc.frequency.exponentialRampToValueAtTime(type === 'burst' ? 25 : mode === 'mice' ? frequency * 1.4 : Math.max(35, frequency * .35), now + duration);
+    osc.frequency.exponentialRampToValueAtTime(mode === 'mice' ? frequency * 1.4 : Math.max(35, frequency * .35), now + duration);
     osc.connect(gain); osc.start(now); osc.stop(now + duration + .02);
-    if (mode === 'lab' || type === 'burst' || type === 'shred') {
+    if (mode === 'lab' || type === 'shred') {
       const length = Math.floor(audioContext.sampleRate * Math.min(duration, .3));
       const buffer = audioContext.createBuffer(1, length, audioContext.sampleRate);
       const data = buffer.getChannelData(0);
@@ -165,7 +156,7 @@ function cancelGesture() {
 }
 
 function reset({ announce = true } = {}) {
-  clearTimeout(completionTimer); clearTimeout(comboTimer); clearTimeout(impactTimer);
+  clearTimeout(comboTimer); clearTimeout(impactTimer);
   cancelGesture();
   if ($('#completion-dialog').open) $('#completion-dialog').close();
   phase = 'ready'; units = 0; sceneHits = 0; score = 0; combo = 0; bestCombo = 0; lastHitAt = null;
@@ -176,7 +167,7 @@ function reset({ announce = true } = {}) {
   $('#hit-button').disabled = false; $('#charge-button').disabled = false; $('#destroy-button').disabled = false;
   $('#hit-button').textContent = modes[mode].hit; $('#destroy-button').textContent = modes[mode].ultimate;
   updateProgress();
-  if (announce) toast('新的一局。坏心情可以无限清空。');
+  if (announce) toast('收拾好了。想再玩一会儿，也可以。');
 }
 
 function setTool(next) {
@@ -207,7 +198,7 @@ function setMode(next, { scroll = false } = {}) {
   universe.setMode(mode); reset({ announce: false }); renderTools();
   document.body.dataset.mode = mode; $('#game-area').dataset.mode = mode;
   $('#scene-name').textContent = modes[mode].name;
-  $('.scene-coordinate').textContent = `PLAY ${modes[mode].number} / 无限重来`;
+  $('.scene-coordinate').textContent = `${PERSONAS[persona].label} / 随时重来`;
   $('#mode-description').textContent = modes[mode].description;
   $('#mode-instruction').textContent = modes[mode].instruction;
   $('#stage-badge').textContent = modes[mode].badge;
@@ -215,12 +206,67 @@ function setMode(next, { scroll = false } = {}) {
   document.querySelectorAll('.mode-card[data-mode]').forEach(card => {
     const active = card.dataset.mode === mode;
     card.classList.toggle('active', active); card.setAttribute('aria-pressed', String(active));
-    card.querySelector('.mode-indicator').textContent = active ? '正在玩' : '开玩 ↗';
+    card.querySelector('.mode-indicator').textContent = active ? '正在这里' : '试试看 ↗';
   });
   if (scroll) {
     $('#game-area').scrollIntoView({ behavior: reducedMotion.matches ? 'instant' : 'smooth', block: 'start' });
     $('#universe').focus({ preventScroll: true });
   }
+}
+
+function setPersona(next) {
+  if (!(next in PERSONAS)) return;
+  cancelGesture();
+  persona = next;
+  modes = PERSONAS[persona].modes;
+  const profile = PERSONAS[persona];
+  universe.setPersona(persona, modes);
+  document.body.dataset.persona = persona;
+  $('#game-area').dataset.persona = persona;
+  document.querySelectorAll('#persona-picker button[data-persona]').forEach(button => {
+    const active = button.dataset.persona === persona;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+  $('#persona-welcome').textContent = profile.welcome;
+  $('#persona-description').textContent = profile.subtitle;
+  document.querySelectorAll('.desktop-description, .mobile-description').forEach(text => { text.textContent = profile.heroDescription; });
+  $('[data-start-label]').textContent = { phd: '甩飞一件仪器', doctor: '盖一个交班章', teacher: '放飞一只纸鹤' }[persona];
+  const art = {
+    phd: ['lab', 'mentor', 'earth', 'mice'],
+    doctor: ['paperwork', 'mentor', 'clock', 'tea'],
+    teacher: ['books', 'mentor', 'forms', 'garden'],
+  }[persona];
+  const methods = {
+    phd: ['甩飞仪器', '放下消息', '蓄力释放', '跟着节拍'],
+    doctor: ['盖章交班', '暂停通知', '拆开排班', '喝杯热茶'],
+    teacher: ['放飞纸鹤', '收起通知', '拆开表格', '听见下课'],
+  }[persona];
+  document.querySelectorAll('.mode-card[data-mode]').forEach((card, index) => {
+    const scene = modes[card.dataset.mode];
+    card.querySelector('.desktop-title').textContent = scene.cardTitle;
+    const short = card.querySelector('.mobile-title');
+    short.replaceChildren(document.createTextNode(scene.cardShort[0]), document.createElement('br'), document.createTextNode(scene.cardShort[1]));
+    card.querySelector('p').textContent = scene.cardDescription;
+    card.querySelector('.card-number').textContent = `${scene.number} / ${methods[index]}`;
+    card.querySelector('.card-art use').setAttribute('href', `#art-${art[index]}`);
+  });
+  document.querySelectorAll('[data-prompt]').forEach((button, index) => {
+    button.dataset.prompt = profile.prompts[index];
+    button.textContent = profile.prompts[index];
+  });
+  $('#vent-input').placeholder = `比如：${profile.prompts[0]}`;
+  $('#permission-card').hidden = true;
+  setMode(mode);
+}
+
+function releaseWords() {
+  const words = {
+    phd: ['仪器先下班。', '消息先放下。', '这一刻，没有截止日期。', '鼠鼠都来啦。'],
+    doctor: ['这一叠，交班了。', '提醒先歇一会儿。', '排班表，散开吧。', '热茶和点心都到啦。'],
+    teacher: ['纸鹤，飞远一点。', '通知先收起来。', '表格，散开吧。', '下课铃响啦。'],
+  };
+  return words[persona][Object.keys(modes).indexOf(mode)];
 }
 
 function hit(x = .5, y = .5, options = {}) {
@@ -241,8 +287,8 @@ function hit(x = .5, y = .5, options = {}) {
   tone('hit', 1 + Math.min(combo, 5) * .1);
   const message = modes[mode].hits[(sceneHits - 1) % modes[mode].hits.length];
   $('#scene-caption').textContent = message;
-  const punches = { hammer: '仪器，起飞！', gravity: '坏心情吸走！', rainbow: '压力溶解了！', shred: '已读，不补。', mute: '世界安静了。', reply: '收到，退回！', meteor: 'DDL 烧成灰！', laser: '返修，清零！', blackhole: '烦恼格式化！', disco: '鼠鼠：准假！', bubbles: '咕噜，快乐！', snacks: '干饭不干活！' };
-  impact(onBeat ? 'PERFECT! 快乐 ×2' : options.fling ? `甩得漂亮！ +${Math.round(earned)}` : combo >= 3 ? `${combo} 连击 · 痛快！` : punches[tool]);
+  const punches = { hammer: releaseWords(), gravity: '轻飘飘地飞走了。', rainbow: '心情添了一点颜色。', shred: '这一条，先放下。', mute: '安静了一点。', reply: '留一点时间给自己。', meteor: '裂开一道缝啦。', laser: '这一块，松开了。', blackhole: '慢慢散开。', disco: '跟上节拍啦。', bubbles: '咕噜，冒个泡。', snacks: '给自己一点甜。' };
+  impact(onBeat ? '合拍！ ×2' : options.fling ? `甩得漂亮！ +${Math.round(earned)}` : combo >= 3 ? `${combo} 连击 · 轻一点了！` : punches[tool]);
   updateProgress();
   if (units >= modes[mode].goal) destroy({ automatic: true, power: options.charge || 1 });
 }
@@ -255,20 +301,22 @@ function destroy({ automatic = false, power = 1 } = {}) {
   universe.burst({ tool, power, combo: bestCombo, intensity });
   tone('burst', 2); updateProgress();
   $('#hit-button').disabled = true; $('#charge-button').disabled = true; $('#destroy-button').disabled = true;
-  $('#scene-caption').textContent = { lab: '设备正在获得它们的第一张登机牌……', mentor: '正在向全宇宙广播：本人已下班。', earth: '正在删除地球旧版本，安装快乐更新……', mice: '带薪假期已生效，鼠鼠开始接管舞池！' }[mode];
-  impact({ lab: '拆！拆！拆！', mentor: '已读，不补。', earth: '地球.exe 已卸载', mice: '鼠鼠万岁！' }[mode]);
-  completionTimer = setTimeout(() => {
-    phase = 'complete'; updateProgress();
-    $('#result-title').textContent = modes[mode].title;
-    $('#result-description').textContent = modes[mode].message.replace('\n', ' ');
-    $('#result-panel').hidden = false; $('#result-button').hidden = false;
-    $('#completion-title').textContent = modes[mode].title;
-    $('#completion-message').textContent = modes[mode].message;
-    $('#completion-stats').textContent = `${score.toLocaleString('zh-CN')} 快乐分 · 最高 ${bestCombo} 连击`;
-    $('#scene-caption').textContent = '';
-    $('#hit-button').disabled = false; $('#charge-button').disabled = false; $('#destroy-button').disabled = false;
-    $('#hit-button').textContent = '再玩一局'; $('#destroy-button').textContent = '宇宙恢复 · 再来！';
-  }, reducedMotion.matches ? 220 : 2000);
+  $('#scene-caption').textContent = `${releaseWords()} 看看它们慢慢飞远。`;
+  impact(releaseWords());
+}
+
+function finishBurst() {
+  if (phase !== 'burst') return;
+  phase = 'complete'; updateProgress();
+  $('#result-title').textContent = modes[mode].title;
+  $('#result-description').textContent = modes[mode].message.replace('\n', ' ');
+  $('#result-panel').hidden = false; $('#result-button').hidden = false;
+  $('#completion-title').textContent = modes[mode].title;
+  $('#completion-message').textContent = modes[mode].message;
+  $('#completion-stats').textContent = `${score.toLocaleString('zh-CN')} 快乐分 · 最高 ${bestCombo} 连击`;
+  $('#scene-caption').textContent = '';
+  $('#hit-button').disabled = false; $('#charge-button').disabled = false; $('#destroy-button').disabled = false;
+  $('#hit-button').textContent = '再玩一会儿'; $('#destroy-button').textContent = '收拾好，再来一次';
 }
 
 function beginCharge(source, position = { x: .5, y: .5 }, owner = null) {
@@ -281,8 +329,8 @@ function beginCharge(source, position = { x: .5, y: .5 }, owner = null) {
     charge = Math.min(1, Math.max(0, (performance.now() - charging.start) / 2400));
     universe.setCharge(charge);
     $('#charge-fill').style.width = `${Math.round(charge * 100)}%`;
-    $('#charge-label').textContent = charge >= 1 ? '蓄满了！松手，让宇宙替你发疯。' : `蓄力 ${Math.round(charge * 100)}% · 继续按住`;
-    $('#charge-button').textContent = charge >= 1 ? '松手！释放宇宙级快乐' : `蓄力中 ${Math.round(charge * 100)}%`;
+    $('#charge-label').textContent = charge >= 1 ? '蓄满了。松开手，让它们飞远一点。' : `蓄力 ${Math.round(charge * 100)}% · 继续按住`;
+    $('#charge-button').textContent = charge >= 1 ? '松开手，放出去吧' : `蓄力中 ${Math.round(charge * 100)}%`;
   };
   tick(); chargeTimer = setInterval(tick, 32);
 }
@@ -361,11 +409,12 @@ $('#destroy-button').addEventListener('click', () => destroy());
 $('#reset-button').addEventListener('click', () => reset());
 $('#start-button').addEventListener('click', () => setMode('lab', { scroll: true }));
 document.querySelectorAll('.mode-card[data-mode]').forEach(card => card.addEventListener('click', () => setMode(card.dataset.mode)));
+document.querySelectorAll('#persona-picker button[data-persona]').forEach(button => button.addEventListener('click', () => setPersona(button.dataset.persona)));
 document.querySelectorAll('button[data-intensity]').forEach(button => button.addEventListener('click', () => {
   intensity = Number(button.dataset.intensity); universe.setIntensity(intensity); $('#game-area').dataset.intensity = String(intensity);
   document.querySelectorAll('button[data-intensity]').forEach(item => item.setAttribute('aria-pressed', String(Number(item.dataset.intensity) === intensity)));
 }));
-$('#sound-toggle').addEventListener('click', () => { soundEnabled = !soundEnabled; updateSound(); tone('hit'); toast(soundEnabled ? '声音开了。每个宇宙都有自己的声响。' : '静音模式。安静地拆，也很痛快。'); });
+$('#sound-toggle').addEventListener('click', () => { soundEnabled = !soundEnabled; updateSound(); tone('hit'); toast(soundEnabled ? '声音开了。听听它们飞走的声音。' : '声音关了。安静地玩一会儿。'); });
 
 function setImmersive(active) {
   const wasActive = $('#game-area').classList.contains('immersive');
@@ -403,27 +452,27 @@ document.querySelectorAll('[data-prompt]').forEach(button => button.addEventList
 $('#shredder-form').addEventListener('submit', event => {
   event.preventDefault(); if (shredding) return;
   const input = $('#vent-input'); const value = input.value.trim();
-  if (!value) { toast('先写一句想吐槽的话。今天不用委婉。'); input.focus(); return; }
+  if (!value) { toast('写一句也好。这里可以说说心里话。'); input.focus(); return; }
   shredding = true; input.disabled = true; $('.shred-button').disabled = true;
-  $('.shred-button span').textContent = '正在把破事切成彩纸……'; $('.shredder-machine').classList.add('paper-shred'); tone('shred');
+  $('.shred-button span').textContent = '正在把这些字变成彩纸……'; $('.shredder-machine').classList.add('paper-shred'); tone('shred');
   const stream = $('#shredder-stream'); stream.replaceChildren();
   Array.from(value).slice(0, 60).forEach((character, index) => {
     const bit = document.createElement('span'); bit.textContent = character;
     bit.style.setProperty('--i', String(index)); bit.style.setProperty('--x', `${Math.random() * 90}%`); bit.style.setProperty('--r', `${Math.random() * 160 - 80}deg`);
     stream.append(bit);
   });
-  $('#shredder-output').textContent = '进纸中 → 压力正在失去它的形状';
+  $('#shredder-output').textContent = '慢慢松开，看看它们飘走。';
   shredTimer = setTimeout(() => {
     input.value = ''; input.disabled = false; shredding = false; stream.replaceChildren();
-    $('#character-count').textContent = '0 / 240'; $('.shred-button').disabled = false; $('.shred-button span').textContent = '粉碎它，让我下班';
+    $('#character-count').textContent = '0 / 240'; $('.shred-button').disabled = false; $('.shred-button span').textContent = '把这句话放下';
     $('.shredder-machine').classList.remove('paper-shred');
-    $('#shredder-output').textContent = '✦ 已粉碎。宇宙里少了一件破事，多了一个准备下班的你。';
+    $('#shredder-output').textContent = '已粉碎。这句话先放下，剩下的时间留给自己。';
     releases++; updateProgress();
   }, reducedMotion.matches ? 180 : 1500);
 });
 
-const permissionMessages = ['经鼠鼠委员会一致表决：今天的你已经足够努力。准予下班，不必内疚。', '兹证明：阴性结果不影响你的下班资格。今日剩余时间归你所有。', '北医宇宙劳动委员会批准：停止脑内组会，开启晚饭、热水澡与睡眠。', '特批一张免补实验券。有效期：此刻。签发人：已逃出动物房的鼠鼠。'];
 $('#permission-button').addEventListener('click', () => {
+  const permissionMessages = PERSONAS[persona].permits;
   $('#permission-text').textContent = permissionMessages[Math.floor(Math.random() * permissionMessages.length)]; $('#permission-card').hidden = false; tone('shred');
   $('#permission-close').focus({ preventScroll: true });
 });
@@ -433,7 +482,7 @@ function stopBreathing({ completed = false } = {}) {
   clearInterval(breathingTimer); breathingRunning = false;
   $('#breathing-orbit').classList.remove('inhale', 'exhale');
   $('#breathing-instruction').textContent = completed ? '做得很好' : '慢下来';
-  $('#breathing-status').textContent = completed ? '这一分钟没有实验。只有被好好照顾的你。' : '实验可以等，先呼吸一下。';
+  $('#breathing-status').textContent = completed ? '这一分钟留给了自己。现在感觉怎么样？' : '事情可以等一会儿，先呼吸一下。';
   $('#breathing-button').textContent = completed ? '再陪我呼吸一分钟 ↗' : '陪我呼吸一分钟 ↗'; $('#breathing-button').setAttribute('aria-pressed', 'false');
   if (completed) { tone('shred'); toast('一分钟到了。喝口水，伸个懒腰吧。'); }
 }
@@ -452,7 +501,7 @@ $('#breathing-button').setAttribute('aria-pressed', 'false');
 $('#breathing-button').addEventListener('click', () => {
   if (breathingRunning) { stopBreathing(); return; }
   breathingRunning = true; breathingStartedAt = Date.now(); breathingPausedAt = 0; breathingPausedDuration = 0;
-  $('#breathing-button').textContent = '结束暂停，慢慢回来'; $('#breathing-button').setAttribute('aria-pressed', 'true');
+  $('#breathing-button').textContent = '我想先停一下'; $('#breathing-button').setAttribute('aria-pressed', 'true');
   breathingTick(); breathingTimer = setInterval(breathingTick, 250);
 });
 document.addEventListener('visibilitychange', () => {
@@ -466,9 +515,9 @@ document.addEventListener('visibilitychange', () => {
 window.addEventListener('blur', cancelGesture);
 reducedMotion.addEventListener('change', event => { universe.reducedMotion = event.matches; });
 window.addEventListener('pagehide', () => {
-  cancelGesture(); clearTimeout(toastTimer); clearTimeout(completionTimer); clearTimeout(shredTimer); clearTimeout(comboTimer); clearTimeout(impactTimer); clearInterval(breathingTimer);
+  cancelGesture(); clearTimeout(toastTimer); clearTimeout(shredTimer); clearTimeout(comboTimer); clearTimeout(impactTimer); clearInterval(breathingTimer);
   $('#vent-input').value = ''; $('#shredder-stream').replaceChildren(); universe.destroy();
   if (audioContext) audioContext.close().catch(() => {});
 });
 window.addEventListener('pageshow', event => { if (event.persisted) location.reload(); });
-setMode('lab');
+setPersona('phd');

@@ -1,12 +1,27 @@
 {
-  "date": "2026-10-05T16:43:58.265Z",
+  "date": "2026-10-06T02:15:37.612Z",
   "base": "http://127.0.0.1:8087/",
-  "version": 2,
+  "version": 3,
+  "passedCount": 38,
   "passed": [
     "page renders four distinct plays and a usable canvas",
     "laboratory equipment responds to a real mouse fling with a bonus",
     "mentor messages drag away and all three reply tools accept input",
     "twelve creative tools work and three intensity choices accept selection",
+    "phd/lab: role-specific scene, touchable tools, ending and replay",
+    "phd/mentor: role-specific scene, touchable tools, ending and replay",
+    "phd/earth: role-specific scene, touchable tools, ending and replay",
+    "phd/mice: role-specific scene, touchable tools, ending and replay",
+    "doctor/lab: role-specific scene, touchable tools, ending and replay",
+    "doctor/mentor: role-specific scene, touchable tools, ending and replay",
+    "doctor/earth: role-specific scene, touchable tools, ending and replay",
+    "doctor/mice: role-specific scene, touchable tools, ending and replay",
+    "teacher/lab: role-specific scene, touchable tools, ending and replay",
+    "teacher/mentor: role-specific scene, touchable tools, ending and replay",
+    "teacher/earth: role-specific scene, touchable tools, ending and replay",
+    "teacher/mice: role-specific scene, touchable tools, ending and replay",
+    "all twelve scenes differ and each role has its own tools and canvas artwork",
+    "switching roles clears an active charge and prevents an old explosion timer returning",
     "lab: scene result, optional dialog and repeat play",
     "mentor: scene result, optional dialog and repeat play",
     "earth: scene result, optional dialog and repeat play",
@@ -23,47 +38,503 @@
     "layout fits widths 320 through 1440 without sideways scrolling",
     "60-second breathing follows inhale/exhale, finishes and cancels",
     "phone touch plays, switches modes, completes and returns to rest",
-    "four animated scenes react and burst, and the offline file plays every mode",
+    "role-specific world and object fragments visibly separate over real animation frames",
+    "four animated scenes show a multi-stage blast and the offline file plays all roles",
     "fresh desktop, mobile and four scene screenshots are saved for review",
     "zero browser errors, unexpected dialogs or failed asset requests"
+  ],
+  "coverage": {
+    "personas": [
+      "phd",
+      "doctor",
+      "teacher"
+    ],
+    "interactiveScenes": 12,
+    "offlineScenes": 12,
+    "responsiveWidths": [
+      320,
+      375,
+      390,
+      600,
+      768,
+      1024,
+      1440
+    ]
+  },
+  "personaScenes": [
+    {
+      "persona": "phd",
+      "mode": "lab",
+      "name": "甩飞仪器",
+      "toolLabels": [
+        "↘砰一下",
+        "◎吸走烦恼",
+        "✺彩虹化开"
+      ],
+      "canvas": "dafd42c6f1ef0d97b839cb14550374cb247e81e08d23cc0db955bcddc02a1aab"
+    },
+    {
+      "persona": "phd",
+      "mode": "mentor",
+      "name": "消息晚点回",
+      "toolLabels": [
+        "≋揉成纸屑",
+        "⊘安静一会儿",
+        "↗下班回复"
+      ],
+      "canvas": "0f2a6b9c8ff9d7a0ab36e27660f630ab326cfd1804973d29fd3f401daa4b3578"
+    },
+    {
+      "persona": "phd",
+      "mode": "earth",
+      "name": "给地球放假",
+      "toolLabels": [
+        "☄烦恼陨石",
+        "⌁一束清空",
+        "◉宇宙吸尘器"
+      ],
+      "canvas": "4250e4c75d1fa319069657c550635b6aeb6e8e25a69abfdb0b126cd7bc2c3168"
+    },
+    {
+      "persona": "phd",
+      "mode": "mice",
+      "name": "跟鼠鼠跳舞",
+      "toolLabels": [
+        "♫一起蹦两下",
+        "○汽水泡泡",
+        "✦小零食雨"
+      ],
+      "canvas": "b00515b0209f277148c4e94cfb88262a8b9228c9a1baea3d319edeee90b716fa"
+    },
+    {
+      "persona": "doctor",
+      "mode": "lab",
+      "name": "文书盖章交班",
+      "toolLabels": [
+        "↘盖章交班",
+        "◎琐事吸走",
+        "✺彩虹清桌"
+      ],
+      "canvas": "c493ae8682e29e81e354fd3929d852a0c0aab1cdc6c4f30f3edf0b51a8820b6a"
+    },
+    {
+      "persona": "doctor",
+      "mode": "mentor",
+      "name": "通知歇一会儿",
+      "toolLabels": [
+        "≋通知碎纸机",
+        "⊘声音调小",
+        "↗稍后再看"
+      ],
+      "canvas": "6a63a69de91bb5ab122ce8e6ee86f8c7bddfe919216e6dcc1a15eff9c7bcc840"
+    },
+    {
+      "persona": "doctor",
+      "mode": "earth",
+      "name": "拆开排班钟",
+      "toolLabels": [
+        "☄下班陨石",
+        "⌁切断忙碌",
+        "◉琐事清空"
+      ],
+      "canvas": "518791d300145b950bc872e41a33b6496c0401808d8c0b6e7535d688b98aa4c6"
+    },
+    {
+      "persona": "doctor",
+      "mode": "mice",
+      "name": "去喝杯热茶",
+      "toolLabels": [
+        "♫茶歇小乐队",
+        "○清凉气泡",
+        "✦点心下雨"
+      ],
+      "canvas": "53272b702608cc36b6399ec33ac4a67f9f87de871c411f85728e7f962e3c4e69"
+    },
+    {
+      "persona": "teacher",
+      "mode": "lab",
+      "name": "把作业折成纸鹤",
+      "toolLabels": [
+        "↘折鹤放飞",
+        "◎琐事打包走",
+        "✺粉笔擦一擦"
+      ],
+      "canvas": "044000f6ad20bcf409bf392465b8f5e1ebe9c6bca02c3381b83291b076e3c550"
+    },
+    {
+      "persona": "teacher",
+      "mode": "mentor",
+      "name": "通知明天看",
+      "toolLabels": [
+        "≋纸屑吹走",
+        "⊘喇叭歇会儿",
+        "↗明天再安排"
+      ],
+      "canvas": "8fe287848cdd65bbddfcc9bc1cbef71fdc0872e41ed90b7344649da1169ac468"
+    },
+    {
+      "persona": "teacher",
+      "mode": "earth",
+      "name": "表格先留白",
+      "toolLabels": [
+        "☄表格陨石",
+        "⌁格子划开",
+        "◉琐事吸尘器"
+      ],
+      "canvas": "b74ce8a81baef11d90d4314d67f039195b31c1f36fc80dde032f92de5c965eda"
+    },
+    {
+      "persona": "teacher",
+      "mode": "mice",
+      "name": "下课去花园",
+      "toolLabels": [
+        "♫花园小乐队",
+        "○风里的泡泡",
+        "✦下午茶雨"
+      ],
+      "canvas": "eb0548c93955177f130d3c6dde18fab6f2ebb8c3bebf8d2ca52403f650e795ff"
+    }
   ],
   "imageChanges": [
     {
       "mode": "lab",
-      "before": "8494a1286ce28c9cac4b325f66e1d463177c58122d353a257d21b55879fa0d6a",
-      "hit": "8bf2936f187b7754eae1e4596fbb606d83a0de8455150d6cc4ca7d00ad761afa",
-      "burst": "dcb38e1f94a9d9e37b2149838e197d6f16e34301c4db32fddadf1ddd325fec92"
+      "before": "ef685208b0c3ad14e81f8c30cc27e9bf8326d524ec988c2d81a8597611b928cd",
+      "hit": "3c84c8aee5fb88a0f09cdb347d3fa3913c45dfe752c44f676d7598a65532e633",
+      "frames": [
+        {
+          "atMs": 122,
+          "filename": "v3-blast-lab-0120.png",
+          "hash": "4f80124cd10b7f310e382df57f8157e76e6a4470d2bfa18ef89324785e786d2f"
+        },
+        {
+          "atMs": 452,
+          "filename": "v3-blast-lab-0450.png",
+          "hash": "535e592fa67302f85b520ff734ba653a7413c5eb0c42409c875f84fc72d51434"
+        },
+        {
+          "atMs": 1002,
+          "filename": "v3-blast-lab-1000.png",
+          "hash": "9fafea1e578a61d04e281302180742c978f165463211feeb987f59a3c5329b9c"
+        },
+        {
+          "atMs": 2202,
+          "filename": "v3-blast-lab-2200.png",
+          "hash": "13ed44532e492cbb20c8f294d1c85a389a43bda1e35fad54b99bd0458c0fddf4"
+        }
+      ],
+      "burst": "90be04edcbff57f517845dcf4e72e62631323c8fae9bca71d3c28c340672c1a4"
     },
     {
       "mode": "mentor",
-      "before": "03eaf3920f81539827c9ab6f3c4d56d7db45ba01e546fe486f70c06e24a9ddf8",
-      "hit": "1bdda5b215be9717d2a4bc95923529f7c638a042c2562ff38627b9cc99ee01e7",
-      "burst": "eaa0199c1836ecd5fdb77d9b51de4778370ac9d23acbedf50d40ed9cac103016"
+      "before": "23ed7682e1f45ab9dbb340c9ad05fae3d928caed949a66ea888177661063268b",
+      "hit": "ed9cf44c596f7a042e0e6c975af8b5ebc6cadd3cc68be910497fa0e522bcce98",
+      "frames": [
+        {
+          "atMs": 122,
+          "filename": "v3-blast-mentor-0120.png",
+          "hash": "9e6c9144967b9e47c04359b4e271948ae8018e03d58b4da1c74c3be22385aceb"
+        },
+        {
+          "atMs": 451,
+          "filename": "v3-blast-mentor-0450.png",
+          "hash": "26be05826ecaf33d43192c3b842abf7410af730e524f1dda1cb1fc4b5afb201a"
+        },
+        {
+          "atMs": 1001,
+          "filename": "v3-blast-mentor-1000.png",
+          "hash": "f01007007ab8bb1b6adaa591596c07a89e7662a105ba2102d91fa6d74addfd18"
+        },
+        {
+          "atMs": 2202,
+          "filename": "v3-blast-mentor-2200.png",
+          "hash": "2475d28a5c7f9168367dec7d1ebc3596c2412a11de64110cc82835c00c8c8408"
+        }
+      ],
+      "burst": "f1a236bde483b3bc66a2ab5e45ef8f9be4a604cbeb47a49e1af407be5935107d"
     },
     {
       "mode": "earth",
-      "before": "8543ef920d457763ed467ea9e349ea674cdfbc7bb57b32b1daeb98da9f0f041b",
-      "hit": "b6c6b6564af80da70377a057d1f954742007ea83d7e1814384c28b0aa66e0c06",
-      "burst": "7860d045537ebf7b6371c96223ae70a11739766ba6916bb9515473730130d174"
+      "before": "28ea8755ed6cf6aac4cc84481a69da0af2f8b8764fc332f5f68628c3b4a2d165",
+      "hit": "2dd927ad32ef1046860c83f72d625c5f643729339f6ef68504c1a538360529e6",
+      "frames": [
+        {
+          "atMs": 121,
+          "filename": "v3-blast-earth-0120.png",
+          "hash": "050ebcfd58eb4b63d75d43ce7743bb0f14a1f6129ff3013a1926cba6f9766eed"
+        },
+        {
+          "atMs": 451,
+          "filename": "v3-blast-earth-0450.png",
+          "hash": "ab7b04d036e64fa2932e5aca8c9c11a4a17c06578afeb53885997c3811357a7d"
+        },
+        {
+          "atMs": 1001,
+          "filename": "v3-blast-earth-1000.png",
+          "hash": "9ebc5c514fd3816823e1e0a8015d554d239b741e48280d4c968ea69f26722637"
+        },
+        {
+          "atMs": 2201,
+          "filename": "v3-blast-earth-2200.png",
+          "hash": "f1dd3097f418dee082b95f5decf3d77f62078f770ca673ad39cfc3d4ae90f932"
+        }
+      ],
+      "burst": "f44ce1ff5aed9a3353d9dac822c521334254c926d00bc77e219f947d79fb5d69"
     },
     {
       "mode": "mice",
-      "before": "c24c9738764419c922b5c42e30915a244fdfa505468504a9394eab1d8848125c",
-      "hit": "aeb947cd53ed5c7d2e3f4f637adceccf74e8436a4221aa3f18f9737ac5f2c64d",
-      "burst": "6968c0a4f6b1fe3f8ab67538d39b7563a044b31bc6cbcef359b88a4cd5824148"
+      "before": "eba15352c8923090508846fe0137bc943c19ee857dbc9fdf6976515d1a5074b1",
+      "hit": "bb748bfd9f6aeaf2fc0245597c4578009ca84c42e537dfea6e204206ec66c554",
+      "frames": [
+        {
+          "atMs": 121,
+          "filename": "v3-blast-mice-0120.png",
+          "hash": "5b609b6ce69bc49cee13a1a4b44077d716389d8baa30c91d92fa6a9efb35f1df"
+        },
+        {
+          "atMs": 451,
+          "filename": "v3-blast-mice-0450.png",
+          "hash": "e32299f4d1c14966a700b420b57250a8c9ac481782ae0a6b15c0a8675bff2e87"
+        },
+        {
+          "atMs": 1001,
+          "filename": "v3-blast-mice-1000.png",
+          "hash": "d22d9420e2d08dd1bd0eda4aa0f03e5b15f584447de30851da3339686d2d599b"
+        },
+        {
+          "atMs": 2201,
+          "filename": "v3-blast-mice-2200.png",
+          "hash": "427578e88aa059bc794e5421e6e81bd31b6b902ce8df4f629fa9f6adf9dd23e1"
+        }
+      ],
+      "burst": "3894a80ae5889b81b1891d70c36a1fcf5ee54ffc55bcec5cc7345c985a291dc2"
+    }
+  ],
+  "fragmentMotion": [
+    {
+      "persona": "phd",
+      "mode": "lab",
+      "duration": 2.6,
+      "samples": [
+        {
+          "age": 0,
+          "pieces": 54,
+          "visible": 54,
+          "meanDistancePx": 0,
+          "finite": true,
+          "kinds": [
+            "material"
+          ]
+        },
+        {
+          "age": 0.18346666666666664,
+          "pieces": 54,
+          "visible": 54,
+          "meanDistancePx": 37.2588934536798,
+          "finite": true,
+          "kinds": [
+            "material"
+          ]
+        },
+        {
+          "age": 0.6500666666666668,
+          "pieces": 54,
+          "visible": 45,
+          "meanDistancePx": 159.92235183865614,
+          "finite": true,
+          "kinds": [
+            "material"
+          ]
+        }
+      ]
+    },
+    {
+      "persona": "phd",
+      "mode": "earth",
+      "duration": 2.6,
+      "samples": [
+        {
+          "age": 0,
+          "pieces": 12,
+          "visible": 12,
+          "meanDistancePx": 0,
+          "finite": true,
+          "kinds": [
+            "world"
+          ]
+        },
+        {
+          "age": 0.16666666666666669,
+          "pieces": 12,
+          "visible": 12,
+          "meanDistancePx": 40.48374997636103,
+          "finite": true,
+          "kinds": [
+            "world"
+          ]
+        },
+        {
+          "age": 0.6499666666666666,
+          "pieces": 12,
+          "visible": 12,
+          "meanDistancePx": 157.87852815781253,
+          "finite": true,
+          "kinds": [
+            "world"
+          ]
+        }
+      ]
+    },
+    {
+      "persona": "doctor",
+      "mode": "lab",
+      "duration": 2.6,
+      "samples": [
+        {
+          "age": 0,
+          "pieces": 54,
+          "visible": 54,
+          "meanDistancePx": 0,
+          "finite": true,
+          "kinds": [
+            "material"
+          ]
+        },
+        {
+          "age": 0.18326666666666683,
+          "pieces": 54,
+          "visible": 54,
+          "meanDistancePx": 1.6390074683192482,
+          "finite": true,
+          "kinds": [
+            "material"
+          ]
+        },
+        {
+          "age": 0.6666666666666665,
+          "pieces": 54,
+          "visible": 53,
+          "meanDistancePx": 123.1949555110809,
+          "finite": true,
+          "kinds": [
+            "material"
+          ]
+        }
+      ]
+    },
+    {
+      "persona": "doctor",
+      "mode": "earth",
+      "duration": 2.6,
+      "samples": [
+        {
+          "age": 0,
+          "pieces": 12,
+          "visible": 12,
+          "meanDistancePx": 0,
+          "finite": true,
+          "kinds": [
+            "world"
+          ]
+        },
+        {
+          "age": 0.1832666666666666,
+          "pieces": 12,
+          "visible": 12,
+          "meanDistancePx": 44.51593147400657,
+          "finite": true,
+          "kinds": [
+            "world"
+          ]
+        },
+        {
+          "age": 0.6499666666666666,
+          "pieces": 12,
+          "visible": 12,
+          "meanDistancePx": 157.87852815781255,
+          "finite": true,
+          "kinds": [
+            "world"
+          ]
+        }
+      ]
+    },
+    {
+      "persona": "teacher",
+      "mode": "lab",
+      "duration": 2.6,
+      "samples": [
+        {
+          "age": 0,
+          "pieces": 54,
+          "visible": 54,
+          "meanDistancePx": 0,
+          "finite": true,
+          "kinds": [
+            "material"
+          ]
+        },
+        {
+          "age": 0.1832666666666666,
+          "pieces": 54,
+          "visible": 54,
+          "meanDistancePx": 36.49134495268581,
+          "finite": true,
+          "kinds": [
+            "material"
+          ]
+        },
+        {
+          "age": 0.6666666666666669,
+          "pieces": 54,
+          "visible": 45,
+          "meanDistancePx": 163.75965945871744,
+          "finite": true,
+          "kinds": [
+            "material"
+          ]
+        }
+      ]
+    },
+    {
+      "persona": "teacher",
+      "mode": "earth",
+      "duration": 2.6,
+      "samples": [
+        {
+          "age": 0,
+          "pieces": 14,
+          "visible": 14,
+          "meanDistancePx": 0,
+          "finite": true,
+          "kinds": [
+            "world"
+          ]
+        },
+        {
+          "age": 0.18336666666666648,
+          "pieces": 14,
+          "visible": 14,
+          "meanDistancePx": 44.60280594763251,
+          "finite": true,
+          "kinds": [
+            "world"
+          ]
+        },
+        {
+          "age": 0.6499666666666666,
+          "pieces": 14,
+          "visible": 14,
+          "meanDistancePx": 158.10036596489493,
+          "finite": true,
+          "kinds": [
+            "world"
+          ]
+        }
+      ]
     }
   ],
   "errors": [],
   "failedRequests": [],
   "unexpectedDialogs": [],
-  "all_passed": true,
-  "finalVisualFixChecks": {
-    "date": "2026-10-05T16:49:14.766181+00:00",
-    "passed": [
-      "desktop result-computer label captured clear of base",
-      "mobile ending uses a single caption and replays",
-      "rebuilt offline file completes and replays all four worlds"
-    ],
-    "errors": []
-  }
+  "all_passed": true
 }

@@ -6,21 +6,23 @@ const { createHash } = require('node:crypto');
 const { pathToFileURL } = require('node:url');
 
 const base = process.env.SITE_URL || 'http://127.0.0.1:8087/';
-const modes = [
-  { id: 'lab', empty: '0 / 6', complete: '6 / 6', title: '实验室，已发射。', tools: ['hammer', 'gravity', 'rainbow'] },
-  { id: 'mentor', empty: '0 / 5', complete: '5 / 5', title: '您已退出加班群聊。', tools: ['shred', 'mute', 'reply'] },
-  { id: 'earth', empty: '0%', complete: '100%', title: '新地球，安装完成。', tools: ['meteor', 'laser', 'blackhole'] },
-  { id: 'mice', empty: '0 / 12', complete: '12 / 12', title: '鼠鼠宣布：全员下班！', tools: ['disco', 'bubbles', 'snacks'] },
+const modeContracts = [
+  { id: 'lab', empty: '0 / 6', complete: '6 / 6', tools: ['hammer', 'gravity', 'rainbow'] },
+  { id: 'mentor', empty: '0 / 5', complete: '5 / 5', tools: ['shred', 'mute', 'reply'] },
+  { id: 'earth', empty: '0%', complete: '100%', tools: ['meteor', 'laser', 'blackhole'] },
+  { id: 'mice', empty: '0 / 12', complete: '12 / 12', tools: ['disco', 'bubbles', 'snacks'] },
 ];
 const digest = buffer => createHash('sha256').update(buffer).digest('hex');
 
 (async () => {
+  const { PERSONAS } = await import(pathToFileURL(path.join(__dirname, '../assets/personas.js')).href);
+  const modes = modeContracts.map(item => ({ ...item, title: PERSONAS.phd.modes[item.id].title }));
   const browser = await chromium.launch({
     headless: true,
     ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}),
     ...(process.env.BROWSER_PROXY ? { proxy: { server: process.env.BROWSER_PROXY } } : {}),
   });
-  const checks = [], errors = [], failedRequests = [], unexpectedDialogs = [], imageChanges = [];
+  const checks = [], errors = [], failedRequests = [], unexpectedDialogs = [], imageChanges = [], personaScenes = [], fragmentMotion = [];
   const observe = (page, label) => {
     page.on('pageerror', error => errors.push(`${label}: ${error.message}`));
     page.on('requestfailed', request => failedRequests.push(`${label}: ${request.url()}`));
@@ -30,12 +32,20 @@ const digest = buffer => createHash('sha256').update(buffer).digest('hex');
   const newPage = async (label, options = {}) => {
     const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce', ...options });
     observe(page, label); await page.goto(base, { waitUntil: 'networkidle' });
-    await page.locator('#scene-name').filter({ hasText: '实验室' }).waitFor(); return page;
+    await page.locator('#game-area[data-persona="phd"][data-phase="ready"]').waitFor();
+    await page.locator('#scene-name').filter({ hasText: PERSONAS.phd.modes.lab.name }).waitFor(); return page;
   };
   const selectMode = async (page, id) => {
     await page.locator(`.mode-card[data-mode="${id}"]`).click();
     assert.equal(await page.locator(`.mode-card[data-mode="${id}"]`).getAttribute('aria-pressed'), 'true');
     assert.equal(await page.locator('#game-area').getAttribute('data-mode'), id);
+  };
+  const selectPersona = async (page, id) => {
+    const choice = page.locator(`#persona-picker button[data-persona="${id}"]`);
+    await choice.click(); assert.equal(await choice.getAttribute('aria-pressed'), 'true');
+    assert.equal(await choice.evaluate(el => el.classList.contains('active')), true);
+    assert.equal(await page.locator('body').getAttribute('data-persona'), id);
+    assert.equal(await page.locator('#game-area').getAttribute('data-persona'), id);
   };
   const progress = page => page.locator('#pressure-value').textContent();
   const score = async page => Number((await page.locator('#scene-score').textContent()).replaceAll(',', ''));
@@ -95,6 +105,12 @@ const digest = buffer => createHash('sha256').update(buffer).digest('hex');
     assert.equal(await page.locator('#result-button').isVisible(), true);
     assert.equal(await page.locator('#hit-button').isEnabled(), true);
   };
+  const canvasFrame = async (page, filename) => {
+    const data = await page.locator('#universe').evaluate(el => el.toDataURL('image/png'));
+    const pixels = Buffer.from(data.split(',')[1], 'base64');
+    if (filename) await fs.writeFile(path.join(__dirname, filename), pixels);
+    return digest(pixels);
+  };
   try {
     const page = await newPage('reduced-motion');
     await verify('page renders four distinct plays and a usable canvas', async () => {
@@ -136,6 +152,52 @@ const digest = buffer => createHash('sha256').update(buffer).digest('hex');
         }
       }
       await page.locator('button[data-intensity="2"]').click();
+    });
+    for (const [persona, profile] of Object.entries(PERSONAS)) {
+      for (const contract of modeContracts) {
+        await verify(`${persona}/${contract.id}: role-specific scene, touchable tools, ending and replay`, async () => {
+          await selectPersona(page, persona); await selectMode(page, contract.id);
+          const scene = profile.modes[contract.id];
+          assert.equal(await page.locator('#scene-name').textContent(), scene.name);
+          assert.equal(await page.locator(`.mode-card[data-mode="${contract.id}"] .desktop-title`).textContent(), scene.cardTitle);
+          assert.equal(await page.locator('#mode-description').textContent(), scene.description);
+          const labels = await page.locator('#tool-rack button').allTextContents();
+          for (const [key, , label] of scene.tools) {
+            assert.ok((await page.locator(`[data-tool="${key}"]`).textContent()).includes(label));
+          }
+          personaScenes.push({ persona, mode: contract.id, name: scene.name, toolLabels: labels,
+            canvas: await canvasFrame(page, `v3-${persona}-${contract.id}.png`) });
+          await page.locator('#hit-button').click(); assert.ok(await score(page) > 0);
+          await page.locator('#destroy-button').click(); await completed(page, { ...contract, title: scene.title });
+          assert.equal(await page.locator('#result-description').textContent(), scene.message.replace('\n', ' '));
+          await page.locator('#hit-button').click(); assert.equal(await progress(page), contract.empty);
+          assert.equal(await page.locator('#result-panel').isVisible(), false);
+        });
+      }
+    }
+    await verify('all twelve scenes differ and each role has its own tools and canvas artwork', async () => {
+      assert.equal(await page.locator('#persona-picker button[data-persona]').count(), 3);
+      assert.equal(personaScenes.length, 12); assert.equal(new Set(personaScenes.map(scene => scene.name)).size, 12);
+      for (const { id } of modeContracts) {
+        const scenes = personaScenes.filter(scene => scene.mode === id);
+        assert.equal(new Set(scenes.map(scene => scene.toolLabels.join('|'))).size, 3, `${id} tool choices adapt to the role`);
+        assert.equal(new Set(scenes.map(scene => scene.canvas)).size, 3, `${id} canvas adapts to the role`);
+      }
+      await selectPersona(page, 'phd');
+    });
+    await verify('switching roles clears an active charge and prevents old scene completion returning', async () => {
+      const switched = await newPage('persona-switch', { reducedMotion: 'no-preference' });
+      await selectMode(switched, 'earth'); await switched.locator('#universe').focus(); await switched.keyboard.down('Space');
+      await switched.waitForTimeout(120); await selectPersona(switched, 'doctor'); await switched.keyboard.up('Space');
+      assert.equal(await progress(switched), '0%'); assert.equal(await switched.locator('#charge-button').getAttribute('aria-pressed'), 'false');
+      assert.equal(await switched.locator('#game-area').getAttribute('data-phase'), 'ready');
+      await switched.locator('#destroy-button').click(); assert.equal(await switched.locator('#game-area').getAttribute('data-phase'), 'burst');
+      await selectPersona(switched, 'teacher'); await switched.waitForTimeout(2900);
+      assert.equal(await switched.locator('#game-area').getAttribute('data-mode'), 'earth');
+      assert.equal(await switched.locator('#scene-name').textContent(), PERSONAS.teacher.modes.earth.name);
+      assert.equal(await progress(switched), '0%'); assert.equal(await switched.locator('#result-panel').isVisible(), false);
+      assert.equal(await switched.locator('#game-area').getAttribute('data-phase'), 'ready');
+      await switched.locator('#hit-button').click(); assert.ok(await score(switched) > 0); await switched.close();
     });
     for (const item of modes) {
       await verify(`${item.id}: scene result, optional dialog and repeat play`, async () => {
@@ -201,7 +263,7 @@ const digest = buffer => createHash('sha256').update(buffer).digest('hex');
     });
     await verify('mouse beat doubles joy and fast actions make a combo that expires', async () => {
       await selectMode(page, 'mice'); await page.locator('#hit-button').click(); await page.waitForTimeout(400); await page.locator('#hit-button').click();
-      assert.equal(await progress(page), '3 / 12'); assert.match(await page.locator('#impact-text').textContent(), /PERFECT/);
+      assert.equal(await progress(page), '3 / 12'); assert.match(await page.locator('#impact-text').textContent(), /合拍/);
       await page.locator('#hit-button').click(); assert.equal(await page.locator('#combo-value').textContent(), '3×');
       await page.waitForTimeout(1470); assert.equal(await page.locator('#combo-value').textContent(), '—');
       await page.locator('#hit-button').click(); assert.equal(await page.locator('#combo-value').textContent(), '—');
@@ -272,41 +334,95 @@ const digest = buffer => createHash('sha256').update(buffer).digest('hex');
       assert.equal(await mobile.locator('#breathing-button').evaluate(el => el === document.activeElement), true);
       assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true); await mobile.close();
     });
-    await verify('four animated scenes react and burst, and the offline file plays every mode', async () => {
+    await verify('role-specific world and object fragments visibly separate over real animation frames', async () => {
+      const probe = await newPage('fragment-motion', { reducedMotion: 'no-preference' });
+      for (const persona of Object.keys(PERSONAS)) {
+        for (const mode of ['lab', 'earth']) {
+          const motion = await probe.evaluate(async ({ persona, mode }) => {
+            const [{ Universe }, { PERSONAS }] = await Promise.all([
+              import(new URL('./assets/universe.js', location.href).href),
+              import(new URL('./assets/personas.js', location.href).href),
+            ]);
+            const canvas = document.createElement('canvas');
+            canvas.style.cssText = 'width:1250px;height:430px;position:fixed;left:-9999px;top:0;pointer-events:none';
+            document.body.append(canvas);
+            const scene = new Universe(canvas, { reducedMotion: false });
+            const sample = () => {
+              const pieces = scene.splitFragments;
+              const visible = pieces.filter(piece => piece.x + scene.offsetX >= 0 && piece.x + scene.offsetX <= scene.viewW
+                && piece.y + scene.offsetY >= 0 && piece.y + scene.offsetY <= scene.viewH);
+              return { age: scene.burstAge, pieces: pieces.length, visible: visible.length,
+                meanDistancePx: pieces.reduce((sum, piece) => sum + Math.hypot(piece.x - piece.originX, piece.y - piece.originY) * scene.scale, 0) / Math.max(1, pieces.length),
+                finite: pieces.every(piece => [piece.x, piece.y, piece.vx, piece.vy, piece.rotation].every(Number.isFinite)),
+                kinds: [...new Set(pieces.map(piece => piece.kind))] };
+            };
+            try {
+              scene.setPersona(persona, PERSONAS[persona].modes); scene.setMode(mode); scene.burst();
+              const samples = [sample()];
+              await new Promise(resolve => setTimeout(resolve, 180)); samples.push(sample());
+              await new Promise(resolve => setTimeout(resolve, 470)); samples.push(sample());
+              return { persona, mode, duration: scene.burstDuration, samples };
+            } finally { scene.destroy(); canvas.remove(); }
+          }, { persona, mode });
+          assert.equal(motion.duration, 2.6);
+          assert.ok(motion.samples[0].pieces >= 8, `${persona}/${mode} splits into visible material`);
+          assert.ok(motion.samples.every(sample => sample.finite), `${persona}/${mode} fragment physics stays finite`);
+          assert.ok(motion.samples[1].visible > 0, `${persona}/${mode} fragments remain on the canvas`);
+          assert.ok(motion.samples[2].meanDistancePx > motion.samples[1].meanDistancePx + 8, `${persona}/${mode} fragments travel across animation frames`);
+          fragmentMotion.push(motion);
+        }
+      }
+      await probe.close();
+    });
+    await verify('four animated scenes show a multi-stage blast and the offline file plays all roles', async () => {
       const animated = await newPage('normal-motion', { reducedMotion: 'no-preference' });
       for (const item of modes) {
-        await selectMode(animated, item.id); const before = digest(await animated.locator('#universe').screenshot());
-        await animated.locator('#hit-button').click(); await animated.waitForTimeout(160); const hit = digest(await animated.locator('#universe').screenshot());
-        await animated.locator('#destroy-button').click(); await animated.waitForTimeout(2100); await completed(animated, item);
-        const burst = digest(await animated.locator('#universe').screenshot()); assert.notEqual(hit, before, `${item.id} hit changes the drawing`);
-        assert.notEqual(burst, before, `${item.id} burst changes the drawing`); imageChanges.push({ mode: item.id, before, hit, burst });
+        await selectMode(animated, item.id); const before = await canvasFrame(animated);
+        await animated.locator('#hit-button').click(); await animated.waitForTimeout(160); const hit = await canvasFrame(animated);
+        await animated.locator('#destroy-button').click(); const blastStarted = Date.now(), frames = [];
+        for (const at of [120, 450, 1000, 2200]) {
+          await animated.waitForTimeout(Math.max(1, at - (Date.now() - blastStarted)));
+          const filename = `v3-blast-${item.id}-${String(at).padStart(4, '0')}.png`;
+          frames.push({ atMs: Date.now() - blastStarted, filename, hash: await canvasFrame(animated, filename) });
+        }
+        await completed(animated, item); const burst = await canvasFrame(animated);
+        assert.notEqual(hit, before, `${item.id} hit changes the drawing`);
+        assert.ok(new Set(frames.map(frame => frame.hash)).size >= 3, `${item.id} explosion changes over multiple time points`);
+        assert.notEqual(burst, before, `${item.id} burst changes the drawing`); imageChanges.push({ mode: item.id, before, hit, frames, burst });
         await animated.locator('#hit-button').click(); assert.equal(await progress(animated), item.empty);
       }
       await animated.close();
       const offline = await browser.newPage({ viewport: { width: 1280, height: 900 }, reducedMotion: 'reduce' });
       observe(offline, 'offline-file'); await offline.goto(pathToFileURL(path.join(__dirname, '../dist/index.html')).href);
-      for (const item of modes) {
-        await selectMode(offline, item.id); await offline.locator('#hit-button').click();
-        assert.ok(await score(offline) > 0); await offline.locator('#destroy-button').click(); await completed(offline, item);
-        await offline.locator('#hit-button').click(); assert.equal(await progress(offline), item.empty);
+      for (const [persona, profile] of Object.entries(PERSONAS)) {
+        await selectPersona(offline, persona);
+        for (const contract of modeContracts) {
+          await selectMode(offline, contract.id); await offline.locator('#hit-button').click();
+          assert.ok(await score(offline) > 0); await offline.locator('#destroy-button').click();
+          await completed(offline, { ...contract, title: profile.modes[contract.id].title });
+          await offline.locator('#hit-button').click(); assert.equal(await progress(offline), contract.empty);
+        }
       }
       await offline.close();
     });
     await verify('fresh desktop, mobile and four scene screenshots are saved for review', async () => {
-      const visual = await newPage('screenshots'); await visual.screenshot({ path: path.join(__dirname, 'v2-hero.png') });
-      await visual.screenshot({ path: path.join(__dirname, 'v2-desktop.png'), fullPage: true });
+      const visual = await newPage('screenshots'); await visual.screenshot({ path: path.join(__dirname, 'v3-hero.png') });
+      await visual.screenshot({ path: path.join(__dirname, 'v3-desktop.png'), fullPage: true });
       for (const item of modes) {
         await selectMode(visual, item.id); await visual.locator('#game-area').scrollIntoViewIfNeeded();
-        await visual.locator('#game-area').screenshot({ path: path.join(__dirname, `v2-mode-${item.id}.png`) });
+        await visual.locator('#game-area').screenshot({ path: path.join(__dirname, `v3-mode-${item.id}.png`) });
       }
       await visual.close();
       const mobileVisual = await newPage('mobile-screenshot', { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
-      await mobileVisual.screenshot({ path: path.join(__dirname, 'v2-mobile.png'), fullPage: true }); await mobileVisual.close();
+      await mobileVisual.screenshot({ path: path.join(__dirname, 'v3-mobile.png'), fullPage: true }); await mobileVisual.close();
     });
     await verify('zero browser errors, unexpected dialogs or failed asset requests', async () => {
       assert.deepEqual(errors, []); assert.deepEqual(failedRequests, []); assert.deepEqual(unexpectedDialogs, []);
     });
-    const report = { date: new Date().toISOString(), base, version: 2, passed: checks, imageChanges, errors, failedRequests, unexpectedDialogs, all_passed: true };
+    const report = { date: new Date().toISOString(), base, version: 3, passedCount: checks.length, passed: checks,
+      coverage: { personas: Object.keys(PERSONAS), interactiveScenes: personaScenes.length, offlineScenes: Object.keys(PERSONAS).length * modeContracts.length,
+        responsiveWidths: [320, 375, 390, 600, 768, 1024, 1440] },
+      personaScenes, imageChanges, fragmentMotion, errors, failedRequests, unexpectedDialogs, all_passed: true };
     await fs.writeFile(path.join(__dirname, 'verification.json'), JSON.stringify(report, null, 2)); console.log(JSON.stringify(report, null, 2));
   } catch (error) {
     console.error(JSON.stringify({ base, passed: checks, errors, failedRequests, unexpectedDialogs }, null, 2)); throw error;

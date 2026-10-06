@@ -1,0 +1,102 @@
+{
+  "checkedAt": "2026-10-06T02:22:32.183Z",
+  "records": [
+    {
+      "role": "phd",
+      "mode": "earth",
+      "width": 1440,
+      "targetMs": 200,
+      "actualMs": 318,
+      "impactInsidePanel": true
+    },
+    {
+      "role": "phd",
+      "mode": "earth",
+      "width": 1440,
+      "targetMs": 700,
+      "actualMs": 792,
+      "impactInsidePanel": true
+    },
+    {
+      "role": "doctor",
+      "mode": "lab",
+      "width": 1440,
+      "targetMs": 200,
+      "actualMs": 290,
+      "impactInsidePanel": true
+    },
+    {
+      "role": "doctor",
+      "mode": "lab",
+      "width": 1440,
+      "targetMs": 700,
+      "actualMs": 786,
+      "impactInsidePanel": true
+    },
+    {
+      "role": "phd",
+      "mode": "earth",
+      "width": 390,
+      "targetMs": 200,
+      "actualMs": 262,
+      "impactInsidePanel": true
+    },
+    {
+      "role": "phd",
+      "mode": "earth",
+      "width": 390,
+      "targetMs": 700,
+      "actualMs": 756,
+      "impactInsidePanel": true
+    },
+    {
+      "role": "doctor",
+      "mode": "lab",
+      "width": 390,
+      "targetMs": 200,
+      "actualMs": 255,
+      "impactInsidePanel": true
+    },
+    {
+      "role": "doctor",
+      "mode": "lab",
+      "width": 390,
+      "targetMs": 700,
+      "actualMs": 757,
+      "impactInsidePanel": true
+    },
+    {
+      "role": "phd",
+      "mode": "earth",
+      "width": 320,
+      "targetMs": 200,
+      "actualMs": 262,
+      "impactInsidePanel": true
+    },
+    {
+      "role": "phd",
+      "mode": "earth",
+      "width": 320,
+      "targetMs": 700,
+      "actualMs": 750,
+      "impactInsidePanel": true
+    },
+    {
+      "role": "doctor",
+      "mode": "lab",
+      "width": 320,
+      "targetMs": 200,
+      "actualMs": 255,
+      "impactInsidePanel": true
+    },
+    {
+      "role": "doctor",
+      "mode": "lab",
+      "width": 320,
+      "targetMs": 700,
+      "actualMs": 758,
+      "impactInsidePanel": true
+    }
+  ],
+  "errors": []
+}
