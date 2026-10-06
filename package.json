@@ -1,9 +1,9 @@
 {
   "name": "beiyi-after-hours",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "private": true,
   "type": "module",
-  "description": "A gentle, playful stress-relief universe for PhD students, doctors and teachers.",
+  "description": "Three distinct stress-relief playgrounds: laboratory, hospital and school.",
   "scripts": {
     "dev": "node scripts/serve.mjs",
     "build": "node scripts/build.mjs",

@@ -1,0 +1,117 @@
+{
+  "date": "2026-10-06T04:00:14.567Z",
+  "freshContextPerPersona": true,
+  "width": 390,
+  "records": [
+    {
+      "persona": "phd",
+      "dom": {
+        "hero": 1,
+        "game": 1,
+        "canvas": 1,
+        "header": 1,
+        "footer": 1,
+        "role": "phd",
+        "phase": "ready",
+        "mode": "lab",
+        "width": 390,
+        "height": 844,
+        "pageHeight": 3317,
+        "landmarks": [
+          {
+            "selector": "header.header",
+            "top": 0,
+            "height": 65
+          },
+          {
+            "selector": ".hero",
+            "top": 65,
+            "height": 134.25
+          },
+          {
+            "selector": "#persona-picker",
+            "top": 226.75,
+            "height": 84
+          },
+          {
+            "selector": "#game-area",
+            "top": 466.75,
+            "height": 879.453125
+          },
+          {
+            "selector": "#rest",
+            "top": 2232.65625,
+            "height": 825.890625
+          },
+          {
+            "selector": "footer.footer",
+            "top": 3162.546875,
+            "height": 154.59375
+          }
+        ]
+      },
+      "files": [
+        "v4-phd-page-390.png",
+        "v4-phd-viewport-top-390.png",
+        "v4-phd-viewport-game-390.png",
+        "v4-phd-viewport-rest-390.png"
+      ]
+    },
+    {
+      "persona": "doctor",
+      "dom": {
+        "hero": 1,
+        "game": 1,
+        "canvas": 1,
+        "header": 1,
+        "footer": 1,
+        "role": "doctor",
+        "phase": "ready",
+        "mode": "lab",
+        "width": 390,
+        "height": 844,
+        "pageHeight": 3317,
+        "landmarks": [
+          {
+            "selector": "header.header",
+            "top": 0,
+            "height": 65
+          },
+          {
+            "selector": ".hero",
+            "top": 65,
+            "height": 134.25
+          },
+          {
+            "selector": "#persona-picker",
+            "top": 226.75,
+            "height": 84
+          },
+          {
+            "selector": "#game-area",
+            "top": 466.75,
+            "height": 879.453125
+          },
+          {
+            "selector": "#rest",
+            "top": 2232.65625,
+            "height": 825.890625
+          },
+          {
+            "selector": "footer.footer",
+            "top": 3162.546875,
+            "height": 154.59375
+          }
+        ]
+      },
+      "files": [
+        "v4-doctor-page-390.png",
+        "v4-doctor-viewport-top-390.png",
+        "v4-doctor-viewport-game-390.png",
+        "v4-doctor-viewport-rest-390.png"
+      ]
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

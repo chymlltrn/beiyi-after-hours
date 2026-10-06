@@ -1,8 +1,8 @@
 {
-  "date": "2026-10-06T02:15:37.612Z",
+  "date": "2026-10-06T03:57:01.768Z",
   "base": "http://127.0.0.1:8087/",
-  "version": 3,
-  "passedCount": 38,
+  "version": 4,
+  "passedCount": 49,
   "passed": [
     "page renders four distinct plays and a usable canvas",
     "laboratory equipment responds to a real mouse fling with a bonus",
@@ -21,7 +21,17 @@
     "teacher/earth: role-specific scene, touchable tools, ending and replay",
     "teacher/mice: role-specific scene, touchable tools, ending and replay",
     "all twelve scenes differ and each role has its own tools and canvas artwork",
-    "switching roles clears an active charge and prevents an old explosion timer returning",
+    "three real settings and twelve target maps reject blank clicks without scoring",
+    "a laboratory mouse and a human PhD student respond separately without removing equipment",
+    "individual PhD mice dance, bubble and eat only when their own target is clicked",
+    "PhD mentor and student avatars have separate responses while messages remain available",
+    "hospital grant, inspection and DRG documents require the matching classification bin",
+    "doctors break the DRG stack and remove actual administrative conveyor papers",
+    "school burdens become different paper balls that physically arrive at the supplied character face",
+    "school paper throws use the real release point when dragging toward or away from the face",
+    "fully charged canvas holds require the actual DDL, DRG or school face target",
+    "doctor and teacher drawings never call the mouse renderer in any ready or exploded scene",
+    "switching roles clears an active charge and prevents old scene completion returning",
     "lab: scene result, optional dialog and repeat play",
     "mentor: scene result, optional dialog and repeat play",
     "earth: scene result, optional dialog and repeat play",
@@ -38,8 +48,9 @@
     "layout fits widths 320 through 1440 without sideways scrolling",
     "60-second breathing follows inhale/exhale, finishes and cancels",
     "phone touch plays, switches modes, completes and returns to rest",
+    "phone touch targets the laboratory mouse, hospital bins and school character separately",
     "role-specific world and object fragments visibly separate over real animation frames",
-    "four animated scenes show a multi-stage blast and the offline file plays all roles",
+    "twelve role-specific animated scenes show a multi-stage blast and the offline file plays all roles",
     "fresh desktop, mobile and four scene screenshots are saved for review",
     "zero browser errors, unexpected dialogs or failed asset requests"
   ],
@@ -51,6 +62,8 @@
     ],
     "interactiveScenes": 12,
     "offlineScenes": 12,
+    "animatedScenes": 12,
+    "responsiveRoleWidthPairs": 21,
     "responsiveWidths": [
       320,
       375,
@@ -65,248 +78,1297 @@
     {
       "persona": "phd",
       "mode": "lab",
-      "name": "甩飞仪器",
+      "name": "甩飞实验仪器",
       "toolLabels": [
         "↘砰一下",
         "◎吸走烦恼",
         "✺彩虹化开"
       ],
-      "canvas": "dafd42c6f1ef0d97b839cb14550374cb247e81e08d23cc0db955bcddc02a1aab"
+      "canvas": "12a5840cb66c6d86f582c5e55cb774ea3d0727e39ca6d9c18c806949965779c6"
     },
     {
       "persona": "phd",
       "mode": "mentor",
-      "name": "消息晚点回",
+      "name": "导师群慢一点",
       "toolLabels": [
         "≋揉成纸屑",
         "⊘安静一会儿",
         "↗下班回复"
       ],
-      "canvas": "0f2a6b9c8ff9d7a0ab36e27660f630ab326cfd1804973d29fd3f401daa4b3578"
+      "canvas": "142e43eb14bec660d54fdb4d185eb3c98c70382a4af5651d99ca040488480ce9"
     },
     {
       "persona": "phd",
       "mode": "earth",
-      "name": "给地球放假",
+      "name": "炸开 DDL 球",
       "toolLabels": [
-        "☄烦恼陨石",
+        "☄烦恼重锤",
         "⌁一束清空",
-        "◉宇宙吸尘器"
+        "◉烦恼吸尘器"
       ],
-      "canvas": "4250e4c75d1fa319069657c550635b6aeb6e8e25a69abfdb0b126cd7bc2c3168"
+      "canvas": "61673fc7fe0fd60a11dc2f7f675794eec94d8facb5ba9c351f73252da9131010"
     },
     {
       "persona": "phd",
       "mode": "mice",
-      "name": "跟鼠鼠跳舞",
+      "name": "和鼠鼠玩一会儿",
       "toolLabels": [
-        "♫一起蹦两下",
-        "○汽水泡泡",
-        "✦小零食雨"
+        "♫鼠鼠转圈",
+        "○鼠鼠泡泡",
+        "✦喂点小零食"
       ],
-      "canvas": "b00515b0209f277148c4e94cfb88262a8b9228c9a1baea3d319edeee90b716fa"
+      "canvas": "d7f7536c536f2314011c1488da606ae468cd8d50d64c7dd2ed4ee14c76b06602"
     },
     {
       "persona": "doctor",
       "mode": "lab",
-      "name": "文书盖章交班",
+      "name": "标书检查归箱",
       "toolLabels": [
-        "↘盖章交班",
-        "◎琐事吸走",
-        "✺彩虹清桌"
+        "↘咚，归箱",
+        "◎一把收好",
+        "✺盖章收工"
       ],
-      "canvas": "c493ae8682e29e81e354fd3929d852a0c0aab1cdc6c4f30f3edf0b51a8820b6a"
+      "canvas": "dd0a395fce6fe39a7e393c4d6b7b6aa1fb5b030983423ee9ea1aebd55bbfecff"
     },
     {
       "persona": "doctor",
       "mode": "mentor",
-      "name": "通知歇一会儿",
+      "name": "行政通知暂停",
       "toolLabels": [
         "≋通知碎纸机",
         "⊘声音调小",
         "↗稍后再看"
       ],
-      "canvas": "6a63a69de91bb5ab122ce8e6ee86f8c7bddfe919216e6dcc1a15eff9c7bcc840"
+      "canvas": "342857fffc93849692820e3266c6e61d840224dea2e5baf2b2573545012f6d44"
     },
     {
       "persona": "doctor",
       "mode": "earth",
-      "name": "拆开排班钟",
+      "name": "DRG 纸堆爆破",
       "toolLabels": [
-        "☄下班陨石",
-        "⌁切断忙碌",
-        "◉琐事清空"
+        "☄盖章爆破",
+        "⌁撕开复印件",
+        "◉纸堆吸走"
       ],
-      "canvas": "518791d300145b950bc872e41a33b6496c0401808d8c0b6e7535d688b98aa4c6"
+      "canvas": "2dfc59a4f258f6a6c09c6db846b8ccb2909f09f6f4415c3d2cf006c8897b9e31"
     },
     {
       "persona": "doctor",
       "mode": "mice",
-      "name": "去喝杯热茶",
+      "name": "行政传送带收工",
       "toolLabels": [
-        "♫茶歇小乐队",
-        "○清凉气泡",
-        "✦点心下雨"
+        "↘盖章收走",
+        "≋卷走文件",
+        "▣送进回收箱"
       ],
-      "canvas": "53272b702608cc36b6399ec33ac4a67f9f87de871c411f85728e7f962e3c4e69"
+      "canvas": "98b92df95a1fe5fd0741d488a124b6f76747cfc568f7e71894f1883ed0a6c11b"
     },
     {
       "persona": "teacher",
       "mode": "lab",
-      "name": "把作业折成纸鹤",
+      "name": "额外任务退回",
       "toolLabels": [
-        "↘折鹤放飞",
-        "◎琐事打包走",
-        "✺粉笔擦一擦"
+        "↘揉团投回",
+        "◎整摞送回",
+        "✺贴条投递"
       ],
-      "canvas": "044000f6ad20bcf409bf392465b8f5e1ebe9c6bca02c3381b83291b076e3c550"
+      "canvas": "ecc8d6d6a0ff2036fcc0f5458ee58b536038e6457aa6f05951917798b9fefe61"
     },
     {
       "persona": "teacher",
       "mode": "mentor",
-      "name": "通知明天看",
+      "name": "通知纸团退回",
       "toolLabels": [
-        "≋纸屑吹走",
-        "⊘喇叭歇会儿",
-        "↗明天再安排"
+        "≋揉团投回",
+        "⊘贴条退回",
+        "↗飞机送回"
       ],
-      "canvas": "8fe287848cdd65bbddfcc9bc1cbef71fdc0872e41ed90b7344649da1169ac468"
+      "canvas": "6d123e9a2311edae634b9d9eb4446e433e21cb0b8a9c4425b89c2d09e72e48a3"
     },
     {
       "persona": "teacher",
       "mode": "earth",
-      "name": "表格先留白",
+      "name": "把负担投回去",
       "toolLabels": [
-        "☄表格陨石",
-        "⌁格子划开",
-        "◉琐事吸尘器"
+        "☄大号纸团",
+        "⌁纸飞机投递",
+        "◉整包送回去"
       ],
-      "canvas": "b74ce8a81baef11d90d4314d67f039195b31c1f36fc80dde032f92de5c965eda"
+      "canvas": "6eff090cf92a02706930e0a7b3232aeafe2e372799e024872c1bc0f514e9bc7b"
     },
     {
       "persona": "teacher",
       "mode": "mice",
-      "name": "下课去花园",
+      "name": "额外任务连发",
       "toolLabels": [
-        "♫花园小乐队",
-        "○风里的泡泡",
-        "✦下午茶雨"
+        "➤纸团连发",
+        "↻回旋纸团",
+        "▤任务贴条"
       ],
-      "canvas": "eb0548c93955177f130d3c6dde18fab6f2ebb8c3bebf8d2ca52403f650e795ff"
+      "canvas": "f0af3dea44b6c33084034526ea2bd89fe240e1bde75e077258fcff4a124a2e76"
+    }
+  ],
+  "targetedInteractions": [
+    {
+      "persona": "phd",
+      "mode": "lab",
+      "environment": "laboratory",
+      "targets": [
+        {
+          "id": 0,
+          "kind": "instrument",
+          "label": "显微镜",
+          "category": "标书",
+          "x": 0.3511573597087712,
+          "y": 0.4369565217391304,
+          "width": 0.09822103166426266,
+          "height": 0.2956521739130435
+        },
+        {
+          "id": 1,
+          "kind": "instrument",
+          "label": "实验电脑",
+          "category": "检查",
+          "x": 0.4856446184490693,
+          "y": 0.4369565217391304,
+          "width": 0.09822103166426266,
+          "height": 0.2956521739130435
+        },
+        {
+          "id": 2,
+          "kind": "instrument",
+          "label": "离心机",
+          "category": "DRG",
+          "x": 0.6450649083041418,
+          "y": 0.4260869565217391,
+          "width": 0.09822103166426266,
+          "height": 0.2956521739130435
+        },
+        {
+          "id": 3,
+          "kind": "instrument",
+          "label": "试管架",
+          "category": "标书",
+          "x": 0.5800879181262449,
+          "y": 0.5978260869565217,
+          "width": 0.09822103166426266,
+          "height": 0.2956521739130435
+        },
+        {
+          "id": 4,
+          "kind": "instrument",
+          "label": "培养瓶",
+          "category": "检查",
+          "x": 0.41462325709183323,
+          "y": 0.6260869565217392,
+          "width": 0.09822103166426266,
+          "height": 0.2956521739130435
+        },
+        {
+          "id": 5,
+          "kind": "instrument",
+          "label": "电泳槽",
+          "category": "DRG",
+          "x": 0.6919087849440209,
+          "y": 0.591304347826087,
+          "width": 0.09822103166426266,
+          "height": 0.2956521739130435
+        },
+        {
+          "id": 99,
+          "kind": "mouse",
+          "x": 0.734974929596813,
+          "y": 0.8282608695652174,
+          "radius": 0.033999587883783225
+        },
+        {
+          "id": 98,
+          "kind": "researcher",
+          "x": 0.2506696888522563,
+          "y": 0.7131304347826086,
+          "width": 0.0764612954186414,
+          "height": 0.38,
+          "radius": 0.06603475513428121,
+          "faceX": 0.2506696888522563,
+          "faceY": 0.6051304347826088
+        }
+      ],
+      "blankDoesNotScore": true
+    },
+    {
+      "persona": "phd",
+      "mode": "mentor",
+      "environment": "laboratory",
+      "targets": [
+        {
+          "id": 0,
+          "kind": "notification",
+          "label": "再补一组实验",
+          "x": 0.31338003983790097,
+          "y": 0.3108695652173913,
+          "width": 0.16168692904732468,
+          "height": 0.18695652173913044
+        },
+        {
+          "id": 1,
+          "kind": "notification",
+          "label": "明早看下初稿",
+          "x": 0.6888865993543513,
+          "y": 0.28695652173913044,
+          "width": 0.16168692904732468,
+          "height": 0.18695652173913044
+        },
+        {
+          "id": 2,
+          "kind": "notification",
+          "label": "周末方便来吗",
+          "x": 0.3088467614533965,
+          "y": 0.6760869565217391,
+          "width": 0.16168692904732468,
+          "height": 0.18695652173913044
+        },
+        {
+          "id": 3,
+          "kind": "notification",
+          "label": "机制还可以再深一点",
+          "x": 0.6919087849440209,
+          "y": 0.6869565217391305,
+          "width": 0.16168692904732468,
+          "height": 0.18695652173913044
+        },
+        {
+          "id": 4,
+          "kind": "notification",
+          "label": "组会记得带结果",
+          "x": 0.5,
+          "y": 0.1826086956521739,
+          "width": 0.16168692904732468,
+          "height": 0.18695652173913044
+        },
+        {
+          "id": 97,
+          "kind": "mentor",
+          "x": 0.39875678274606774,
+          "y": 0.338695652173913,
+          "radius": 0.022666391922522153
+        },
+        {
+          "id": 98,
+          "kind": "researcher",
+          "x": 0.6012432172539323,
+          "y": 0.338695652173913,
+          "radius": 0.022666391922522153
+        }
+      ],
+      "blankDoesNotScore": true
+    },
+    {
+      "persona": "phd",
+      "mode": "earth",
+      "environment": "laboratory",
+      "targets": [
+        {
+          "id": 0,
+          "kind": "ddl-ball",
+          "x": 0.5,
+          "y": 0.51,
+          "radius": 0.1042654028436019
+        }
+      ],
+      "blankDoesNotScore": true
+    },
+    {
+      "persona": "phd",
+      "mode": "mice",
+      "environment": "laboratory",
+      "targets": [
+        {
+          "id": 0,
+          "kind": "mouse",
+          "x": 0.36324610206744967,
+          "y": 0.4673913043478261,
+          "radius": 0.04079950546053988
+        },
+        {
+          "id": 1,
+          "kind": "mouse",
+          "x": 0.6390205371248026,
+          "y": 0.4673913043478261,
+          "radius": 0.04079950546053988
+        },
+        {
+          "id": 2,
+          "kind": "mouse",
+          "x": 0.42973418504018135,
+          "y": 0.6847826086956522,
+          "radius": 0.04079950546053988
+        },
+        {
+          "id": 3,
+          "kind": "mouse",
+          "x": 0.5793323717288276,
+          "y": 0.6847826086956522,
+          "radius": 0.04079950546053988
+        },
+        {
+          "id": 98,
+          "kind": "researcher",
+          "x": 0.5,
+          "y": 0.7146956521739131,
+          "width": 0.06067037571261762,
+          "height": 0.3015217391304348,
+          "radius": 0.05239714266089704,
+          "faceX": 0.5,
+          "faceY": 0.6290000000000001
+        }
+      ],
+      "blankDoesNotScore": true
+    },
+    {
+      "persona": "doctor",
+      "mode": "lab",
+      "environment": "hospital",
+      "targets": [
+        {
+          "id": 0,
+          "kind": "document",
+          "label": "基金标书",
+          "category": "标书",
+          "x": 0.32697987499141423,
+          "y": 0.26521739130434785,
+          "width": 0.09822103166426266,
+          "height": 0.2956521739130435
+        },
+        {
+          "id": 1,
+          "kind": "document",
+          "label": "迎检材料",
+          "category": "检查",
+          "x": 0.5,
+          "y": 0.26521739130434785,
+          "width": 0.09822103166426266,
+          "height": 0.2956521739130435
+        },
+        {
+          "id": 2,
+          "kind": "document",
+          "label": "DRG说明",
+          "category": "DRG",
+          "x": 0.6730201250085858,
+          "y": 0.26521739130434785,
+          "width": 0.09822103166426266,
+          "height": 0.2956521739130435
+        },
+        {
+          "id": 3,
+          "kind": "document",
+          "label": "课题预算",
+          "category": "标书",
+          "x": 0.32697987499141423,
+          "y": 0.5217391304347826,
+          "width": 0.09822103166426266,
+          "height": 0.2956521739130435
+        },
+        {
+          "id": 4,
+          "kind": "document",
+          "label": "检查台账",
+          "category": "检查",
+          "x": 0.5,
+          "y": 0.5217391304347826,
+          "width": 0.09822103166426266,
+          "height": 0.2956521739130435
+        },
+        {
+          "id": 5,
+          "kind": "document",
+          "label": "DRG复核",
+          "category": "DRG",
+          "x": 0.6730201250085858,
+          "y": 0.5217391304347826,
+          "width": 0.09822103166426266,
+          "height": 0.2956521739130435
+        }
+      ],
+      "blankDoesNotScore": true
+    },
+    {
+      "persona": "doctor",
+      "mode": "mentor",
+      "environment": "hospital",
+      "targets": [
+        {
+          "id": 0,
+          "kind": "notification",
+          "label": "标书格式又调整了",
+          "x": 0.31338003983790097,
+          "y": 0.3108695652173913,
+          "width": 0.16168692904732468,
+          "height": 0.18695652173913044
+        },
+        {
+          "id": 1,
+          "kind": "notification",
+          "label": "迎检材料再补一份",
+          "x": 0.6888865993543513,
+          "y": 0.28695652173913044,
+          "width": 0.16168692904732468,
+          "height": 0.18695652173913044
+        },
+        {
+          "id": 2,
+          "kind": "notification",
+          "label": "DRG说明请重新录入",
+          "x": 0.3088467614533965,
+          "y": 0.6760869565217391,
+          "width": 0.16168692904732468,
+          "height": 0.18695652173913044
+        },
+        {
+          "id": 3,
+          "kind": "notification",
+          "label": "明早临时加个会",
+          "x": 0.6919087849440209,
+          "y": 0.6869565217391305,
+          "width": 0.16168692904732468,
+          "height": 0.18695652173913044
+        },
+        {
+          "id": 4,
+          "kind": "notification",
+          "label": "检查台账换新模板了",
+          "x": 0.5,
+          "y": 0.1826086956521739,
+          "width": 0.16168692904732468,
+          "height": 0.18695652173913044
+        }
+      ],
+      "blankDoesNotScore": true
+    },
+    {
+      "persona": "doctor",
+      "mode": "earth",
+      "environment": "hospital",
+      "targets": [
+        {
+          "id": 0,
+          "kind": "drg-stack",
+          "x": 0.5,
+          "y": 0.51,
+          "radius": 0.1042654028436019
+        }
+      ],
+      "blankDoesNotScore": true
+    },
+    {
+      "persona": "doctor",
+      "mode": "mice",
+      "environment": "hospital",
+      "targets": [
+        {
+          "id": 0,
+          "kind": "queue-paper",
+          "label": "标书排版",
+          "x": 0.3519129061061886,
+          "y": 0.49,
+          "width": 0.11635414520228038,
+          "height": 0.2608695652173913
+        },
+        {
+          "id": 1,
+          "kind": "queue-paper",
+          "label": "迎检材料",
+          "x": 0.5015110927948349,
+          "y": 0.49,
+          "width": 0.11635414520228038,
+          "height": 0.2608695652173913
+        },
+        {
+          "id": 2,
+          "kind": "queue-paper",
+          "label": "DRG补录",
+          "x": 0.651109279483481,
+          "y": 0.49,
+          "width": 0.11635414520228038,
+          "height": 0.2608695652173913
+        }
+      ],
+      "blankDoesNotScore": true
+    },
+    {
+      "persona": "teacher",
+      "mode": "lab",
+      "environment": "school",
+      "targets": [
+        {
+          "id": 0,
+          "kind": "document",
+          "label": "非教学报表",
+          "category": "标书",
+          "x": 0.3065801222611443,
+          "y": 0.30869565217391304,
+          "width": 0.09822103166426266,
+          "height": 0.2956521739130435
+        },
+        {
+          "id": 1,
+          "kind": "document",
+          "label": "迎检材料",
+          "category": "检查",
+          "x": 0.4410673810014424,
+          "y": 0.30869565217391304,
+          "width": 0.09822103166426266,
+          "height": 0.2956521739130435
+        },
+        {
+          "id": 2,
+          "kind": "document",
+          "label": "打卡截图",
+          "category": "DRG",
+          "x": 0.3065801222611443,
+          "y": 0.5239130434782608,
+          "width": 0.09822103166426266,
+          "height": 0.2956521739130435
+        },
+        {
+          "id": 3,
+          "kind": "document",
+          "label": "临时会议",
+          "category": "标书",
+          "x": 0.4410673810014424,
+          "y": 0.5239130434782608,
+          "width": 0.09822103166426266,
+          "height": 0.2956521739130435
+        },
+        {
+          "id": 4,
+          "kind": "document",
+          "label": "重复录入",
+          "category": "检查",
+          "x": 0.3065801222611443,
+          "y": 0.7391304347826086,
+          "width": 0.09822103166426266,
+          "height": 0.2956521739130435
+        },
+        {
+          "id": 5,
+          "kind": "document",
+          "label": "评比台账",
+          "category": "DRG",
+          "x": 0.4410673810014424,
+          "y": 0.7391304347826086,
+          "width": 0.09822103166426266,
+          "height": 0.2956521739130435
+        }
+      ],
+      "blankDoesNotScore": true
+    },
+    {
+      "persona": "teacher",
+      "mode": "mentor",
+      "environment": "school",
+      "targets": [
+        {
+          "id": 0,
+          "kind": "notification",
+          "label": "非教学报表再报一次",
+          "x": 0.31338003983790097,
+          "y": 0.3108695652173913,
+          "width": 0.16168692904732468,
+          "height": 0.18695652173913044
+        },
+        {
+          "id": 1,
+          "kind": "notification",
+          "label": "迎检材料今晚补齐",
+          "x": 0.6888865993543513,
+          "y": 0.28695652173913044,
+          "width": 0.16168692904732468,
+          "height": 0.18695652173913044
+        },
+        {
+          "id": 2,
+          "kind": "notification",
+          "label": "打卡截图发群里",
+          "x": 0.3088467614533965,
+          "y": 0.6760869565217391,
+          "width": 0.16168692904732468,
+          "height": 0.18695652173913044
+        },
+        {
+          "id": 3,
+          "kind": "notification",
+          "label": "临时会议占用课后",
+          "x": 0.6919087849440209,
+          "y": 0.6869565217391305,
+          "width": 0.16168692904732468,
+          "height": 0.18695652173913044
+        },
+        {
+          "id": 4,
+          "kind": "notification",
+          "label": "同一份资料换表重填",
+          "x": 0.5,
+          "y": 0.1826086956521739,
+          "width": 0.16168692904732468,
+          "height": 0.18695652173913044
+        }
+      ],
+      "blankDoesNotScore": true
+    },
+    {
+      "persona": "teacher",
+      "mode": "earth",
+      "environment": "school",
+      "targets": [
+        {
+          "id": 0,
+          "kind": "face",
+          "x": 0.49913867710694415,
+          "y": 0.3837608695652174,
+          "radius": 0.03626622707603544
+        }
+      ],
+      "blankDoesNotScore": true
+    },
+    {
+      "persona": "teacher",
+      "mode": "mice",
+      "environment": "school",
+      "targets": [
+        {
+          "id": 0,
+          "kind": "face",
+          "x": 0.49913867710694415,
+          "y": 0.3837608695652174,
+          "radius": 0.03626622707603544
+        }
+      ],
+      "blankDoesNotScore": true
+    },
+    {
+      "persona": "phd",
+      "mode": "lab",
+      "responses": {
+        "mouseFeedback": {
+          "applied": false,
+          "gain": 0,
+          "message": "鼠鼠蹭了蹭你的手。先陪它歇一会儿。",
+          "impact": "鼠鼠也松了一口气",
+          "interaction": "mouse-pet",
+          "targetId": 99
+        },
+        "studentFeedback": {
+          "applied": false,
+          "gain": 0,
+          "message": "博士生把肩膀放下来，喝了口水。今天已经很努力了。",
+          "impact": "博士生也休息一下",
+          "interaction": "researcher-rest",
+          "targetId": 98
+        },
+        "reactedMouseIds": [
+          99
+        ],
+        "studentReaction": 1.8,
+        "remainingEquipment": 6
+      }
+    },
+    {
+      "persona": "phd",
+      "mode": "mice",
+      "tool": "disco",
+      "targetId": 2,
+      "interaction": "mouse-dance"
+    },
+    {
+      "persona": "phd",
+      "mode": "mice",
+      "tool": "bubbles",
+      "targetId": 2,
+      "interaction": "mouse-bubble"
+    },
+    {
+      "persona": "phd",
+      "mode": "mice",
+      "tool": "snacks",
+      "targetId": 2,
+      "interaction": "mouse-feed"
+    },
+    {
+      "persona": "doctor",
+      "mode": "lab",
+      "label": "基金标书",
+      "category": "标书",
+      "bin": "标书",
+      "wrongAttemptScoresZero": true
+    },
+    {
+      "persona": "doctor",
+      "mode": "lab",
+      "label": "迎检材料",
+      "category": "检查",
+      "bin": "检查",
+      "wrongAttemptScoresZero": false
+    },
+    {
+      "persona": "doctor",
+      "mode": "lab",
+      "label": "DRG说明",
+      "category": "DRG",
+      "bin": "DRG",
+      "wrongAttemptScoresZero": false
+    },
+    {
+      "persona": "doctor",
+      "mode": "lab",
+      "label": "课题预算",
+      "category": "标书",
+      "bin": "标书",
+      "wrongAttemptScoresZero": false
+    },
+    {
+      "persona": "doctor",
+      "mode": "lab",
+      "label": "检查台账",
+      "category": "检查",
+      "bin": "检查",
+      "wrongAttemptScoresZero": false
+    },
+    {
+      "persona": "doctor",
+      "mode": "lab",
+      "label": "DRG复核",
+      "category": "DRG",
+      "bin": "DRG",
+      "wrongAttemptScoresZero": false
+    },
+    {
+      "persona": "doctor",
+      "mode": "mice",
+      "paper": "标书排版",
+      "interaction": "admin-queue-clear"
+    },
+    {
+      "persona": "teacher",
+      "mode": "mice",
+      "papers": {
+        "asset": "ready",
+        "rolePaths": [
+          {
+            "mode": "lab",
+            "interaction": "burden-return",
+            "label": "非教学报表",
+            "to": [
+              566.86,
+              176.53
+            ],
+            "face": [
+              566.86,
+              176.53
+            ]
+          },
+          {
+            "mode": "mentor",
+            "interaction": "notification-face",
+            "label": "非教学报表再报一次",
+            "to": [
+              398.86,
+              176.53
+            ],
+            "face": [
+              398.86,
+              176.53
+            ]
+          },
+          {
+            "mode": "earth",
+            "interaction": "paper-face",
+            "label": "非教学报表",
+            "to": [
+              398.86,
+              176.53
+            ],
+            "face": [
+              398.86,
+              176.53
+            ]
+          },
+          {
+            "mode": "mice",
+            "interaction": "paper-face",
+            "label": "非教学报表",
+            "to": [
+              398.86,
+              176.53
+            ],
+            "face": [
+              398.86,
+              176.53
+            ]
+          }
+        ],
+        "feedback": [
+          {
+            "applied": true,
+            "gain": 1,
+            "message": "「非教学报表」送回了发任务的人。",
+            "impact": "非教学报表 · 退回！",
+            "interaction": "paper-face",
+            "targetId": 0
+          },
+          {
+            "applied": true,
+            "gain": 1,
+            "message": "「迎检材料」送回了发任务的人。",
+            "impact": "迎检材料 · 退回！",
+            "interaction": "paper-face",
+            "targetId": 0
+          },
+          {
+            "applied": true,
+            "gain": 1,
+            "message": "「打卡截图」送回了发任务的人。",
+            "impact": "打卡截图 · 退回！",
+            "interaction": "paper-face",
+            "targetId": 0
+          }
+        ],
+        "launched": [
+          {
+            "label": "非教学报表",
+            "from": [
+              132,
+              374
+            ],
+            "to": [
+              398.86,
+              176.53
+            ]
+          },
+          {
+            "label": "迎检材料",
+            "from": [
+              132,
+              374
+            ],
+            "to": [
+              398.86,
+              176.53
+            ]
+          },
+          {
+            "label": "打卡截图",
+            "from": [
+              132,
+              374
+            ],
+            "to": [
+              398.86,
+              176.53
+            ]
+          }
+        ],
+        "face": [
+          398.86,
+          176.53
+        ],
+        "stickers": [
+          "非教学报表",
+          "迎检材料",
+          "打卡截图"
+        ],
+        "contacts": 3
+      }
+    },
+    {
+      "persona": "teacher",
+      "mode": "earth",
+      "dragToFaceApplied": true,
+      "dragAwayFromFaceApplied": false
+    },
+    {
+      "persona": "teacher",
+      "mode": "mice",
+      "dragToFaceApplied": true,
+      "dragAwayFromFaceApplied": false
+    },
+    {
+      "persona": "phd",
+      "mode": "earth",
+      "chargedBlankApplied": false,
+      "chargedTargetKind": "ddl-ball",
+      "chargedTargetApplied": true
+    },
+    {
+      "persona": "doctor",
+      "mode": "earth",
+      "chargedBlankApplied": false,
+      "chargedTargetKind": "drg-stack",
+      "chargedTargetApplied": true
+    },
+    {
+      "persona": "teacher",
+      "mode": "earth",
+      "chargedBlankApplied": false,
+      "chargedTargetKind": "face",
+      "chargedTargetApplied": true
+    }
+  ],
+  "loadedOfflineImages": [
+    {
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSU",
+      "width": 1024,
+      "height": 1536
     }
   ],
   "imageChanges": [
     {
+      "persona": "phd",
       "mode": "lab",
-      "before": "ef685208b0c3ad14e81f8c30cc27e9bf8326d524ec988c2d81a8597611b928cd",
-      "hit": "3c84c8aee5fb88a0f09cdb347d3fa3913c45dfe752c44f676d7598a65532e633",
+      "before": "12a5840cb66c6d86f582c5e55cb774ea3d0727e39ca6d9c18c806949965779c6",
+      "hit": "7398f0306b975b8d74c26fc30de8d87f304f85beb75974c51a68dbc1a8658c3b",
       "frames": [
         {
           "atMs": 122,
-          "filename": "v3-blast-lab-0120.png",
-          "hash": "4f80124cd10b7f310e382df57f8157e76e6a4470d2bfa18ef89324785e786d2f"
+          "filename": "v4-blast-phd-lab-0120.png",
+          "hash": "1efeb02ca79ff51ab895a5415beaa0365919ed456d90c0a11b784a7e923cb2fb"
         },
         {
           "atMs": 452,
-          "filename": "v3-blast-lab-0450.png",
-          "hash": "535e592fa67302f85b520ff734ba653a7413c5eb0c42409c875f84fc72d51434"
+          "filename": "v4-blast-phd-lab-0450.png",
+          "hash": "35b77d1901eb7016a431f1ff247545f05174190e5fef70dd004145c1ba90dc39"
         },
         {
-          "atMs": 1002,
-          "filename": "v3-blast-lab-1000.png",
-          "hash": "9fafea1e578a61d04e281302180742c978f165463211feeb987f59a3c5329b9c"
+          "atMs": 1001,
+          "filename": "v4-blast-phd-lab-1000.png",
+          "hash": "a9085077b65c89ab91fccebf815a026757bcd2ddc7ef5af5cbb9be03d4f85a89"
         },
         {
-          "atMs": 2202,
-          "filename": "v3-blast-lab-2200.png",
-          "hash": "13ed44532e492cbb20c8f294d1c85a389a43bda1e35fad54b99bd0458c0fddf4"
+          "atMs": 2203,
+          "filename": "v4-blast-phd-lab-2200.png",
+          "hash": "746c47bd5007032ea1af0ba8093e72dd2ea7e2ebfe3460a109b181d00372bdcc"
         }
       ],
-      "burst": "90be04edcbff57f517845dcf4e72e62631323c8fae9bca71d3c28c340672c1a4"
+      "burst": "528f6fef720607df47749b7ad5f8aafcc59c0fee23920422d6d4ad2f5688cd5b"
     },
     {
+      "persona": "phd",
       "mode": "mentor",
-      "before": "23ed7682e1f45ab9dbb340c9ad05fae3d928caed949a66ea888177661063268b",
-      "hit": "ed9cf44c596f7a042e0e6c975af8b5ebc6cadd3cc68be910497fa0e522bcce98",
+      "before": "ee99b883d917278f3084e9afe20e7c6dfee40c7ac73b4cda4db1d597ae2b8639",
+      "hit": "b70c26586f6cb6a2f2ad42dcb2bd99be71aac15b4c0f42a82cec2b6c9274e9f4",
       "frames": [
         {
           "atMs": 122,
-          "filename": "v3-blast-mentor-0120.png",
-          "hash": "9e6c9144967b9e47c04359b4e271948ae8018e03d58b4da1c74c3be22385aceb"
+          "filename": "v4-blast-phd-mentor-0120.png",
+          "hash": "d3982a960e746c4d2a0b9ec1613eeeeb5f1bf159f960e719d3c1e063d875df25"
         },
         {
-          "atMs": 451,
-          "filename": "v3-blast-mentor-0450.png",
-          "hash": "26be05826ecaf33d43192c3b842abf7410af730e524f1dda1cb1fc4b5afb201a"
+          "atMs": 453,
+          "filename": "v4-blast-phd-mentor-0450.png",
+          "hash": "a2b75471da4febe2857c1e44c289937f147d9ec82b2a0840bc498c3a7528b77e"
         },
         {
-          "atMs": 1001,
-          "filename": "v3-blast-mentor-1000.png",
-          "hash": "f01007007ab8bb1b6adaa591596c07a89e7662a105ba2102d91fa6d74addfd18"
+          "atMs": 1002,
+          "filename": "v4-blast-phd-mentor-1000.png",
+          "hash": "156572cd6e0f22b1fa14b4bd5f33789e14b0ed995089fcd5dc38f7fec9b94610"
         },
         {
           "atMs": 2202,
-          "filename": "v3-blast-mentor-2200.png",
-          "hash": "2475d28a5c7f9168367dec7d1ebc3596c2412a11de64110cc82835c00c8c8408"
+          "filename": "v4-blast-phd-mentor-2200.png",
+          "hash": "c74155a7147d09d6e1247fcd6d789f2ee972b31baf21a99f56a631fb3faecb23"
         }
       ],
-      "burst": "f1a236bde483b3bc66a2ab5e45ef8f9be4a604cbeb47a49e1af407be5935107d"
+      "burst": "6461d91752fb07a4b7da80eaaf1aa8721933edc90406d1f5214b8d7b2814ba75"
     },
     {
+      "persona": "phd",
       "mode": "earth",
-      "before": "28ea8755ed6cf6aac4cc84481a69da0af2f8b8764fc332f5f68628c3b4a2d165",
-      "hit": "2dd927ad32ef1046860c83f72d625c5f643729339f6ef68504c1a538360529e6",
+      "before": "6ca89db5b2bee84b410196bea8688f1bad9a6cb29dfb60771eba0ad1c4a2844d",
+      "hit": "5361b63d94a4fee113f92c0e8e6fa0bb53d6c52dca72758d0107fe4ec6213db2",
       "frames": [
         {
-          "atMs": 121,
-          "filename": "v3-blast-earth-0120.png",
-          "hash": "050ebcfd58eb4b63d75d43ce7743bb0f14a1f6129ff3013a1926cba6f9766eed"
+          "atMs": 122,
+          "filename": "v4-blast-phd-earth-0120.png",
+          "hash": "0a9ffa9e4e8bd767ede00071c0c5eef4c0966e8f4be2d1a572dd84b6f0e7b04a"
         },
         {
-          "atMs": 451,
-          "filename": "v3-blast-earth-0450.png",
-          "hash": "ab7b04d036e64fa2932e5aca8c9c11a4a17c06578afeb53885997c3811357a7d"
+          "atMs": 453,
+          "filename": "v4-blast-phd-earth-0450.png",
+          "hash": "bf2634d6210074373d246631dfb7fb3c1ed318bb80aa4bd850a3a5843757596a"
         },
         {
           "atMs": 1001,
-          "filename": "v3-blast-earth-1000.png",
-          "hash": "9ebc5c514fd3816823e1e0a8015d554d239b741e48280d4c968ea69f26722637"
+          "filename": "v4-blast-phd-earth-1000.png",
+          "hash": "9aa58a1cb189323d93ca58d5e3422f3f5830becb0557646f1f2e51e6fb15da80"
         },
         {
-          "atMs": 2201,
-          "filename": "v3-blast-earth-2200.png",
-          "hash": "f1dd3097f418dee082b95f5decf3d77f62078f770ca673ad39cfc3d4ae90f932"
+          "atMs": 2203,
+          "filename": "v4-blast-phd-earth-2200.png",
+          "hash": "082b8feba96cc75ada6e8ba3025aa021508420c0fa5122004a2a5204245229e2"
         }
       ],
-      "burst": "f44ce1ff5aed9a3353d9dac822c521334254c926d00bc77e219f947d79fb5d69"
+      "burst": "096bd26eb972e5bfb866ce4b0cd4578a03f24d333916b945f65ab3405c641003"
     },
     {
+      "persona": "phd",
       "mode": "mice",
-      "before": "eba15352c8923090508846fe0137bc943c19ee857dbc9fdf6976515d1a5074b1",
-      "hit": "bb748bfd9f6aeaf2fc0245597c4578009ca84c42e537dfea6e204206ec66c554",
+      "before": "3ada0ab757a8151eccac2f0d47659733adbd40fc452b482e5d8d91e44efda4fe",
+      "hit": "627660762a1558eadac8dd1b6d419ff3c9ed1072f2c99f593479d9a15e9018ca",
       "frames": [
         {
           "atMs": 121,
-          "filename": "v3-blast-mice-0120.png",
-          "hash": "5b609b6ce69bc49cee13a1a4b44077d716389d8baa30c91d92fa6a9efb35f1df"
+          "filename": "v4-blast-phd-mice-0120.png",
+          "hash": "aa3ed2c8d0385753b878443635f1cba704e5f0cd71bed03d52cf659c64ca84f7"
         },
         {
-          "atMs": 451,
-          "filename": "v3-blast-mice-0450.png",
-          "hash": "e32299f4d1c14966a700b420b57250a8c9ac481782ae0a6b15c0a8675bff2e87"
+          "atMs": 452,
+          "filename": "v4-blast-phd-mice-0450.png",
+          "hash": "8679b427a5b21a8f561029809400bcbd320c53deedfe0e7e69d0ed1e855aed6d"
         },
         {
-          "atMs": 1001,
-          "filename": "v3-blast-mice-1000.png",
-          "hash": "d22d9420e2d08dd1bd0eda4aa0f03e5b15f584447de30851da3339686d2d599b"
+          "atMs": 1002,
+          "filename": "v4-blast-phd-mice-1000.png",
+          "hash": "0864ebba9bd462b178c63f4670ae9f92ed5757b02a5ed161339ea114c2f46087"
         },
         {
           "atMs": 2201,
-          "filename": "v3-blast-mice-2200.png",
-          "hash": "427578e88aa059bc794e5421e6e81bd31b6b902ce8df4f629fa9f6adf9dd23e1"
+          "filename": "v4-blast-phd-mice-2200.png",
+          "hash": "414e3fa4848d85e5e55aa350195d44f525f118b217b38e4282e54b524ac1ec87"
         }
       ],
-      "burst": "3894a80ae5889b81b1891d70c36a1fcf5ee54ffc55bcec5cc7345c985a291dc2"
+      "burst": "639d5d9792d80cd280386134228f6969e71c0fad4f378b4125dd693ba67e664a"
+    },
+    {
+      "persona": "doctor",
+      "mode": "lab",
+      "before": "dd0a395fce6fe39a7e393c4d6b7b6aa1fb5b030983423ee9ea1aebd55bbfecff",
+      "hit": "65cf89652b31af348c66416c426d44e1d849a472f35691b1e020586b79e02fbd",
+      "frames": [
+        {
+          "atMs": 122,
+          "filename": "v4-blast-doctor-lab-0120.png",
+          "hash": "86a334f98005edf25f7a6957cb0b17db1606c297567fafef999756184ab91c53"
+        },
+        {
+          "atMs": 453,
+          "filename": "v4-blast-doctor-lab-0450.png",
+          "hash": "77e9fef64db5f26b285919bb96a9333690cf0ccbd6d7ddf8a9a7005211afe01a"
+        },
+        {
+          "atMs": 1003,
+          "filename": "v4-blast-doctor-lab-1000.png",
+          "hash": "f2383e3ddc360edeedc17f8104336ae9541a6ec7f7f5ebdad545dc20a3e3af18"
+        },
+        {
+          "atMs": 2202,
+          "filename": "v4-blast-doctor-lab-2200.png",
+          "hash": "3ba3ec94c82db668f044b4f9a2dd67b7778d7216f7df75c7b63387b0abfc9a5f"
+        }
+      ],
+      "burst": "11803132f3a2cf160f9ba3184745a7b2ced60c0044b1f5aeafcc59bf357a9cce"
+    },
+    {
+      "persona": "doctor",
+      "mode": "mentor",
+      "before": "157fb4336e62c475314abd03803b9e463636dff742cc7f166192fbd500cba9b5",
+      "hit": "aa7c45ec9238b9b8484c9c515a44ba565d51dc374994be8d9eefba4cdb80d0f9",
+      "frames": [
+        {
+          "atMs": 122,
+          "filename": "v4-blast-doctor-mentor-0120.png",
+          "hash": "77c38942e61fefbee985dfca396ba2035c48fad2f0373d99b8a64dcdaa7ac8a8"
+        },
+        {
+          "atMs": 452,
+          "filename": "v4-blast-doctor-mentor-0450.png",
+          "hash": "73edd56418e01499f80cbf1baf5707d350d2069f9d27f73490b27b9e3b5b7199"
+        },
+        {
+          "atMs": 1003,
+          "filename": "v4-blast-doctor-mentor-1000.png",
+          "hash": "7911eeeb551ffaef5831afe1e3f300ad0c921dc48dffd0fa9d6dde87f5337973"
+        },
+        {
+          "atMs": 2201,
+          "filename": "v4-blast-doctor-mentor-2200.png",
+          "hash": "4e9b8be21af8b380a063016e18d327884be8c5d3fbf43797ec9222a169a7918f"
+        }
+      ],
+      "burst": "9d4151ad86a423e328162f1f2a506de043df84de1e1578edfc3782b65d395e7f"
+    },
+    {
+      "persona": "doctor",
+      "mode": "earth",
+      "before": "2dfc59a4f258f6a6c09c6db846b8ccb2909f09f6f4415c3d2cf006c8897b9e31",
+      "hit": "6af9e97dc08d5f364221e227faf6565fcf62009a1528610d66b58f22627af2df",
+      "frames": [
+        {
+          "atMs": 122,
+          "filename": "v4-blast-doctor-earth-0120.png",
+          "hash": "3c4fb918fa9ae949d04e72202ad4687fee5305248ae523f62a596c3d0491765d"
+        },
+        {
+          "atMs": 452,
+          "filename": "v4-blast-doctor-earth-0450.png",
+          "hash": "d12adef5f591693b220567ef53a609e6ced23a9855f6f22e13ceaa5976c22435"
+        },
+        {
+          "atMs": 1002,
+          "filename": "v4-blast-doctor-earth-1000.png",
+          "hash": "4ed2c2cefc0e0b9a533d7c418c4495d43f884e40476eb28cb9f1f8153feddda6"
+        },
+        {
+          "atMs": 2203,
+          "filename": "v4-blast-doctor-earth-2200.png",
+          "hash": "f3701a240548e521c7d300e78e2685e18c775c07ea0295f2ed57f387569478ad"
+        }
+      ],
+      "burst": "d45ea562fe80eda8a0d873f1b851ce7afb1f2714960c9be6ebb567a5e0c3e1d6"
+    },
+    {
+      "persona": "doctor",
+      "mode": "mice",
+      "before": "3339239a2d76e5de1918b77b230859f686fd44c7b0c2e32141f81f277ea89820",
+      "hit": "b480e5c8e2f575e4ae95bf56d4cbd872e385fe35e1e7d472b8037411ee111307",
+      "frames": [
+        {
+          "atMs": 122,
+          "filename": "v4-blast-doctor-mice-0120.png",
+          "hash": "cec9d3b57b9767a6aaecb69a7e5757126929b8b2fc8c1c4c793be669e6cbac8a"
+        },
+        {
+          "atMs": 453,
+          "filename": "v4-blast-doctor-mice-0450.png",
+          "hash": "23aa053943c887534ca866495258d77457a35d25b84d6f16efdfbb06bcf4c31d"
+        },
+        {
+          "atMs": 1002,
+          "filename": "v4-blast-doctor-mice-1000.png",
+          "hash": "c6df282c180d004d10ab385b27ea8d7a721b7c0024f444420532fa0a851cf087"
+        },
+        {
+          "atMs": 2202,
+          "filename": "v4-blast-doctor-mice-2200.png",
+          "hash": "ab62a57c8cc27460d5f0dccdb02692e34593a7400dd36838cf5fd577eca632f8"
+        }
+      ],
+      "burst": "a995b02d74d2116abfd43224a6f49409fc44ae9bacb200d7920c143c9dfae7ea"
+    },
+    {
+      "persona": "teacher",
+      "mode": "lab",
+      "before": "ecc8d6d6a0ff2036fcc0f5458ee58b536038e6457aa6f05951917798b9fefe61",
+      "hit": "1a70c3010369d7ffab25fe56a8bee0f36b7e61f3c28068dff0b875d8ada8e6c8",
+      "frames": [
+        {
+          "atMs": 122,
+          "filename": "v4-blast-teacher-lab-0120.png",
+          "hash": "f6018d006b32816b9aa198f3d01f8e73c8f786db2567164a9fbb01425970a0bc"
+        },
+        {
+          "atMs": 452,
+          "filename": "v4-blast-teacher-lab-0450.png",
+          "hash": "efb4ee7e8085471189e38731b9ea5194ebcf1e35e775461f82a432934c25f558"
+        },
+        {
+          "atMs": 1002,
+          "filename": "v4-blast-teacher-lab-1000.png",
+          "hash": "8e395896db005a5645951e5e95fb5f8a81c5290949e90d88aa8031f98026a350"
+        },
+        {
+          "atMs": 2202,
+          "filename": "v4-blast-teacher-lab-2200.png",
+          "hash": "cb22f16eafd33e66c3cd6b88c7ef203b2d7c8e9b5033a8d7700417e782d0bd65"
+        }
+      ],
+      "burst": "a743f0229aaee91675e3d793f0f3b9daef21dd4463ff4042b66eff6ac8656a13"
+    },
+    {
+      "persona": "teacher",
+      "mode": "mentor",
+      "before": "22e11ac9bbf42ded06ae8a4dff758956ab4c6f70e0141433405324f39322c14b",
+      "hit": "ba29c44b97b31348c01853f1c1bacd50fc3b3f71b1aa797e8ef61ff93b863bdb",
+      "frames": [
+        {
+          "atMs": 122,
+          "filename": "v4-blast-teacher-mentor-0120.png",
+          "hash": "96ff17bf2329588eed0695292ebffb9a49eb16cc25359b80a9d345c5e3e1fe24"
+        },
+        {
+          "atMs": 452,
+          "filename": "v4-blast-teacher-mentor-0450.png",
+          "hash": "6b4b421d771d34bc7315474e2ed86e8ded72f2d9339c12da0bde57e7d6667bbe"
+        },
+        {
+          "atMs": 1003,
+          "filename": "v4-blast-teacher-mentor-1000.png",
+          "hash": "ba5dd3c7876dd1b748d5a899b2caa8fef3b7315d261e57617e0a44ec14f7cba6"
+        },
+        {
+          "atMs": 2202,
+          "filename": "v4-blast-teacher-mentor-2200.png",
+          "hash": "fb75e78f3bc966ea8389adcb17635a2511cbea8d984eab080ef6399705acce90"
+        }
+      ],
+      "burst": "44d70894b65072e86590ec21ae548479e8457d0330569b5c2573f5ac4cc12147"
+    },
+    {
+      "persona": "teacher",
+      "mode": "earth",
+      "before": "6eff090cf92a02706930e0a7b3232aeafe2e372799e024872c1bc0f514e9bc7b",
+      "hit": "5cac8a3052240ed0d9cc24e5a19872bae88563a8acffac2ea1c661b6a9e95a31",
+      "frames": [
+        {
+          "atMs": 121,
+          "filename": "v4-blast-teacher-earth-0120.png",
+          "hash": "92facb3133adccc7089becae94e03a232ee7719bc216a254632700916bf6643a"
+        },
+        {
+          "atMs": 452,
+          "filename": "v4-blast-teacher-earth-0450.png",
+          "hash": "d334f3cdea1a9a0d0a3efdb2f050f7befda7ea5fd173e0aeccc2c89250e852de"
+        },
+        {
+          "atMs": 1003,
+          "filename": "v4-blast-teacher-earth-1000.png",
+          "hash": "ffb447985b5c6a17109e2dcf5fa4700b6c56c67fd609e9e712a4abf30a6bc158"
+        },
+        {
+          "atMs": 2201,
+          "filename": "v4-blast-teacher-earth-2200.png",
+          "hash": "d0d56624c8dd0195665b141b0121d577c58a3d4d28aa94b2aa22e6be19c57730"
+        }
+      ],
+      "burst": "f9aa0a18ca5cd776313cca719c8723e22f1eddf3ebd3300f77bb8698cdfc9703"
+    },
+    {
+      "persona": "teacher",
+      "mode": "mice",
+      "before": "f0af3dea44b6c33084034526ea2bd89fe240e1bde75e077258fcff4a124a2e76",
+      "hit": "d0cbc26301cbe68dd3e270eee96dee696e4452b99e32f07a60dfa26c2802202a",
+      "frames": [
+        {
+          "atMs": 122,
+          "filename": "v4-blast-teacher-mice-0120.png",
+          "hash": "7a50911d897163f54fb8c060aa9e16471093d04f3cdcf3c9b61555abfca10ab5"
+        },
+        {
+          "atMs": 451,
+          "filename": "v4-blast-teacher-mice-0450.png",
+          "hash": "b3567fb500c3e89ef9385c0b8c19bc090f5cb6f250060d505deec7eb3a756a31"
+        },
+        {
+          "atMs": 1002,
+          "filename": "v4-blast-teacher-mice-1000.png",
+          "hash": "0146464c16ef6a4e106eeab30c11b05d0fac846dd6e6f88a3f502eb190f0210b"
+        },
+        {
+          "atMs": 2201,
+          "filename": "v4-blast-teacher-mice-2200.png",
+          "hash": "680204fd1b6c778d71879313a0017352ff1f84d7e854ba959a25f47f8755ac57"
+        }
+      ],
+      "burst": "5c41f00088ecc8f794a1646084e297c6012acb0c9b99024f48cbf701b1c4f9fb"
     }
   ],
   "fragmentMotion": [
@@ -326,20 +1388,20 @@
           ]
         },
         {
-          "age": 0.18346666666666664,
+          "age": 0.1832666666666666,
           "pieces": 54,
           "visible": 54,
-          "meanDistancePx": 37.2588934536798,
+          "meanDistancePx": 35.83193070160018,
           "finite": true,
           "kinds": [
             "material"
           ]
         },
         {
-          "age": 0.6500666666666668,
+          "age": 0.6499666666666667,
           "pieces": 54,
           "visible": 45,
-          "meanDistancePx": 159.92235183865614,
+          "meanDistancePx": 159.03893862395523,
           "finite": true,
           "kinds": [
             "material"
@@ -363,20 +1425,20 @@
           ]
         },
         {
-          "age": 0.16666666666666669,
+          "age": 0.1832666666666668,
           "pieces": 12,
           "visible": 12,
-          "meanDistancePx": 40.48374997636103,
+          "meanDistancePx": 44.26866367203328,
           "finite": true,
           "kinds": [
             "world"
           ]
         },
         {
-          "age": 0.6499666666666666,
+          "age": 0.6498666666666668,
           "pieces": 12,
           "visible": 12,
-          "meanDistancePx": 157.87852815781253,
+          "meanDistancePx": 156.977422144409,
           "finite": true,
           "kinds": [
             "world"
@@ -400,20 +1462,20 @@
           ]
         },
         {
-          "age": 0.18326666666666683,
+          "age": 0.19996666666666665,
           "pieces": 54,
           "visible": 54,
-          "meanDistancePx": 1.6390074683192482,
+          "meanDistancePx": 41.04186258758335,
           "finite": true,
           "kinds": [
             "material"
           ]
         },
         {
-          "age": 0.6666666666666665,
+          "age": 0.6832666666666669,
           "pieces": 54,
-          "visible": 53,
-          "meanDistancePx": 123.1949555110809,
+          "visible": 33,
+          "meanDistancePx": 169.29853985234544,
           "finite": true,
           "kinds": [
             "material"
@@ -428,32 +1490,32 @@
       "samples": [
         {
           "age": 0,
-          "pieces": 12,
-          "visible": 12,
+          "pieces": 63,
+          "visible": 63,
           "meanDistancePx": 0,
           "finite": true,
           "kinds": [
-            "world"
+            "material"
           ]
         },
         {
-          "age": 0.1832666666666666,
-          "pieces": 12,
-          "visible": 12,
-          "meanDistancePx": 44.51593147400657,
+          "age": 0.20006666666666675,
+          "pieces": 63,
+          "visible": 63,
+          "meanDistancePx": 35.644178143030096,
           "finite": true,
           "kinds": [
-            "world"
+            "material"
           ]
         },
         {
-          "age": 0.6499666666666666,
-          "pieces": 12,
-          "visible": 12,
-          "meanDistancePx": 157.87852815781255,
+          "age": 0.6667666666666667,
+          "pieces": 63,
+          "visible": 54,
+          "meanDistancePx": 154.4704321896637,
           "finite": true,
           "kinds": [
-            "world"
+            "material"
           ]
         }
       ]
@@ -465,8 +1527,8 @@
       "samples": [
         {
           "age": 0,
-          "pieces": 54,
-          "visible": 54,
+          "pieces": 63,
+          "visible": 63,
           "meanDistancePx": 0,
           "finite": true,
           "kinds": [
@@ -474,60 +1536,60 @@
           ]
         },
         {
-          "age": 0.1832666666666666,
-          "pieces": 54,
-          "visible": 54,
-          "meanDistancePx": 36.49134495268581,
+          "age": 0.1831666666666667,
+          "pieces": 63,
+          "visible": 63,
+          "meanDistancePx": 31.888792686701194,
           "finite": true,
           "kinds": [
             "material"
           ]
         },
         {
-          "age": 0.6666666666666669,
-          "pieces": 54,
+          "age": 0.6498666666666667,
+          "pieces": 63,
+          "visible": 42,
+          "meanDistancePx": 154.86261764217485,
+          "finite": true,
+          "kinds": [
+            "material"
+          ]
+        }
+      ]
+    },
+    {
+      "persona": "teacher",
+      "mode": "earth",
+      "duration": 2.6,
+      "samples": [
+        {
+          "age": 0,
+          "pieces": 63,
+          "visible": 63,
+          "meanDistancePx": 0,
+          "finite": true,
+          "kinds": [
+            "material"
+          ]
+        },
+        {
+          "age": 0.1833666666666665,
+          "pieces": 63,
+          "visible": 63,
+          "meanDistancePx": 31.074169033271836,
+          "finite": true,
+          "kinds": [
+            "material"
+          ]
+        },
+        {
+          "age": 0.6500666666666667,
+          "pieces": 63,
           "visible": 45,
-          "meanDistancePx": 163.75965945871744,
+          "meanDistancePx": 150.47578398567282,
           "finite": true,
           "kinds": [
             "material"
-          ]
-        }
-      ]
-    },
-    {
-      "persona": "teacher",
-      "mode": "earth",
-      "duration": 2.6,
-      "samples": [
-        {
-          "age": 0,
-          "pieces": 14,
-          "visible": 14,
-          "meanDistancePx": 0,
-          "finite": true,
-          "kinds": [
-            "world"
-          ]
-        },
-        {
-          "age": 0.18336666666666648,
-          "pieces": 14,
-          "visible": 14,
-          "meanDistancePx": 44.60280594763251,
-          "finite": true,
-          "kinds": [
-            "world"
-          ]
-        },
-        {
-          "age": 0.6499666666666666,
-          "pieces": 14,
-          "visible": 14,
-          "meanDistancePx": 158.10036596489493,
-          "finite": true,
-          "kinds": [
-            "world"
           ]
         }
       ]
@@ -535,6 +1597,7 @@
   ],
   "errors": [],
   "failedRequests": [],
+  "httpErrors": [],
   "unexpectedDialogs": [],
   "all_passed": true
 }

@@ -1,16 +1,17 @@
 const TAU = Math.PI * 2;
+const TEACHER_CHARACTER_URL = new URL('./teacher-character.png?v=4', import.meta.url).href;
 const C = { ink: '#293c46', white: '#f5f0e8', lime: '#bac8a1', purple: '#b3a9c6', pink: '#d4adb3', blue: '#a7c3cd', gold: '#d9c5a1' };
 const TOOLS = { lab: ['hammer', 'gravity', 'rainbow'], mentor: ['shred', 'mute', 'reply'], earth: ['meteor', 'laser', 'blackhole'], mice: ['disco', 'bubbles', 'snacks'] };
 const clamp = (value, min = 0, max = 1) => Math.max(min, Math.min(max, Number.isFinite(value) ? value : min));
 const LAB_KINDS = {
   phd: ['microscope', 'monitor', 'centrifuge', 'tubes', 'flask', 'gel'],
-  doctor: ['clipboard', 'pager', 'clock', 'folders', 'cup', 'keyboard'],
-  teacher: ['books', 'board', 'pencils', 'worksheets', 'cup', 'bell']
+  doctor: Array(6).fill('document'),
+  teacher: Array(6).fill('burden-paper')
 };
 const LAB_NAMES = {
   phd: ['显微镜', '结果电脑', '离心机', '试管架', '培养瓶', '跑胶仪'],
-  doctor: ['交班记录', '待办提醒', '值班时钟', '文书堆', '凉掉的咖啡', '录入键盘'],
-  teacher: ['备课书', '板书', '铅笔筒', '作业堆', '保温杯', '上课铃']
+  doctor: ['基金标书', '迎检材料', 'DRG说明', '课题预算', '检查台账', 'DRG复核'],
+  teacher: ['非教学报表', '迎检材料', '打卡截图', '临时会议', '重复录入', '评比台账']
 };
 
 /** Four local arcade worlds. The application owns input, sound and counters. */
@@ -34,7 +35,11 @@ export class Universe {
     this.aim = { x: 0.5, y: 0.5 };
     this.gesture = null;
     this.dragTarget = null;
-    this.stars = Array.from({ length: 82 }, (_, i) => ({ x: (Math.sin(i * 113.7 + 3) + 1) / 2, y: (Math.sin(i * 217.3 + 9) + 1) / 2, r: i % 9 ? 0.9 : 2, phase: i * 1.8 }));
+    this.teacherAssetStatus = 'loading';
+    this.teacherImage = new Image();
+    this.teacherImage.onload = () => { this.teacherAssetStatus = 'ready'; this.draw(); this.wake(); };
+    this.teacherImage.onerror = () => { this.teacherAssetStatus = 'error'; this.draw(); };
+    this.teacherImage.src = TEACHER_CHARACTER_URL;
     this.tick = this.tick.bind(this);
     this.resize = this.resize.bind(this);
     this.onVisibility = () => {
@@ -65,6 +70,12 @@ export class Universe {
     this.equipment = this.paintFor('lab').equipmentKinds.slice(0, 6).map((kind, i) => ({ kind, id: i, gone: false }));
     this.cards = this.paintFor('mentor').cards.slice(0, 5).map((text, i) => ({ text, id: i, gone: false }));
     this.guests = 4;
+    this.mouseReactions = [];
+    this.researcherReaction = 0;
+    this.faceReaction = 0;
+    this.stickers = [];
+    this.queue = this.paintFor('mice').queueLabels.map((text, id) => ({ id, text, gone: false }));
+    this.lastInteraction = null;
     this.hits = 0;
     this.shake = 0;
     this.charge = 0;
@@ -85,7 +96,7 @@ export class Universe {
     this.canvas.height = Math.round(this.height * this.dpr);
     this.mobile = this.width / this.height < 1.3;
     // Keep the game camera at its authored aspect ratio on wide desktop stages.
-    // The ambient universe fills the gutters; gameplay and pointer math share this camera.
+    // The workplace fills the gutters; gameplay and pointer math share this camera.
     this.scale = this.mobile ? this.width / 800 : Math.min(this.width / 800, this.height / 460);
     this.H = this.mobile ? this.height / this.scale : 460;
     this.viewW = this.width / this.scale;
@@ -99,19 +110,89 @@ export class Universe {
   layout() {
     const h = this.H || 460;
     if (this.mobile) {
-      this.equipment.forEach((item, i) => { item.x = 244 + (i % 2) * 310; item.y = 235 + Math.floor(i / 2) * Math.min(176, (h - 285) / 3); });
-      const positionsCards = [[211, 123], [589, 123], [211, h * 0.66], [589, h * 0.66], [400, h - 90]];
-      this.cards.forEach((card, i) => { [card.x, card.y] = positionsCards[i]; });
-      this.core = { x: 400, y: h * 0.43, r: 65 };
-      this.globe = { x: 400, y: h * 0.46, r: 205 };
+      this.equipment.forEach((item, i) => { item.x = 238 + (i % 2) * 320; item.y = 228 + Math.floor(i / 2) * Math.min(156, (h - 325) / 3); });
+      const positions = [[205, 141], [595, 141], [205, h * 0.64], [595, h * 0.64], [400, h - 110]];
+      this.cards.forEach((card, i) => { [card.x, card.y] = positions[i]; });
+      this.core = { x: 400, y: h * 0.42, r: 72 };
+      this.globe = { x: 400, y: h * 0.44, r: 188 };
+      this.labMouse = { id: 99, x: 645, y: h - 145, radius: 88 };
+      this.researcher = { id: 98, x: 136, y: h - 91, radius: 90 };
     } else {
       const positions = [[203, 245], [381, 245], [592, 240], [506, 319], [287, 332], [654, 316]];
       this.equipment.forEach((item, i) => { [item.x, item.y] = positions[i]; });
       const positionsCards = [[153, 143], [650, 132], [147, 311], [654, 316], [400, 84]];
       this.cards.forEach((card, i) => { [card.x, card.y] = positionsCards[i]; });
       this.core = { x: 400, y: h * 0.48, r: 74 };
-      this.globe = { x: 400, y: h * 0.5, r: Math.min(142, h * 0.33) };
+      this.globe = { x: 400, y: h * 0.51, r: 138 };
+      this.labMouse = { id: 99, x: 711, y: 406, radius: 45 };
+      this.researcher = { id: 98, x: 70, y: 409, radius: 46 };
     }
+    if (this.persona === 'doctor') {
+      const paperY = this.mobile ? h * 0.29 : 166;
+      this.equipment.forEach((item, i) => { item.x = this.mobile ? 222 + (i % 2) * 356 : 171 + (i % 3) * 229; item.y = paperY + Math.floor(i / (this.mobile ? 2 : 3)) * (this.mobile ? 130 : 118); });
+    }
+    this.bins = this.paintFor('lab').binLabels.map((label, id) => ({ id, label, x: 158 + id * 242, y: this.mobile ? h - 149 : 388, width: this.mobile ? 190 : 183, height: this.mobile ? 91 : 67 }));
+    const spriteHeight = this.mobile ? Math.min(h * 0.67, 650) : 342;
+    const spriteWidth = spriteHeight * (2 / 3);
+    const spriteX = this.persona === 'teacher' && this.mode === 'lab' ? (this.mobile ? 402 : 454) : 400 - spriteWidth / 2, spriteY = this.mobile ? h * 0.22 : 103;
+    this.character = { x: spriteX, y: spriteY, width: spriteWidth, height: spriteHeight,
+      faceX: spriteX + spriteWidth * 0.495, faceY: spriteY + spriteHeight * 0.215,
+      faceRadius: this.mobile ? 85 : 48 };
+    if (this.persona === 'teacher' && this.mode === 'lab') this.equipment.forEach((item, i) => { item.x = (this.mobile ? 137 : 144) + (i % 2) * (this.mobile ? 196 : 178); item.y = (this.mobile ? h * 0.29 : 186) + Math.floor(i / 2) * (this.mobile ? 156 : 99); });
+    this.layoutQueue();
+  }
+
+  get environment() { return { phd: 'laboratory', doctor: 'hospital', teacher: 'school' }[this.persona]; }
+
+  normalized(x, y) { return { x: (x + this.offsetX) / this.viewW, y: (y + this.offsetY) / this.viewH }; }
+
+  getTargets() {
+    let targets = [];
+    if (this.mode === 'lab') {
+      targets = this.equipment.filter(item => !item.gone).map(item => ({ id: item.id, kind: this.persona === 'phd' ? 'instrument' : 'document', label: this.paintFor('lab').equipmentNames[item.id], category: this.paintFor('lab').documentCategories[item.id % 6], ...this.normalized(item.x, item.y - 44), width: 130 / this.viewW, height: 136 / this.viewH }));
+      if (this.persona === 'phd') targets.push({ id: 99, kind: 'mouse', ...this.normalized(this.labMouse.x, this.labMouse.y - 25), radius: this.labMouse.radius / this.viewW }, this.researcherTarget());
+    } else if (this.mode === 'mentor') targets = this.cards.filter(item => !item.gone).map(item => ({ id: item.id, kind: 'notification', label: item.text, ...this.normalized(item.x, item.y), width: (this.mobile ? 340 : 214) / this.viewW, height: (this.mobile ? 108 : 86) / this.viewH }));
+    else if (this.persona === 'teacher') targets = [{ id: 0, kind: 'face', ...this.normalized(this.character.faceX, this.character.faceY), radius: this.character.faceRadius / this.viewW }];
+    else if (this.mode === 'earth') targets = [{ id: 0, kind: this.persona === 'phd' ? 'ddl-ball' : 'drg-stack', ...this.normalized(this.globe.x, this.globe.y), radius: this.globe.r / this.viewW }];
+    else if (this.persona === 'doctor') { this.layoutQueue(); targets = this.queue.filter(item => !item.gone && Number.isFinite(item.x)).slice(0, 3).map(item => ({ id: item.id, kind: 'queue-paper', label: item.text, ...this.normalized(item.x, item.y), width: 154 / this.viewW, height: 120 / this.viewH })); }
+    else targets = this.mouseSpots().map(item => ({ id: item.id, kind: 'mouse', ...this.normalized(item.x, item.y - 28), radius: (this.mobile ? 82 : 54) / this.viewW })).concat([this.researcherTarget()]);
+    if (this.mode === 'mentor' && this.persona === 'phd') targets.push({ id: 97, kind: 'mentor', ...this.normalized(this.core.x - 134, this.core.y - 65), radius: 30 / this.viewW }, { id: 98, kind: 'researcher', ...this.normalized(this.core.x + 134, this.core.y - 65), radius: 30 / this.viewW });
+    const face = this.normalized(this.character.faceX, this.character.faceY);
+    return { environment: this.environment, persona: this.persona, mode: this.mode, targets,
+      bins: this.persona === 'doctor' && this.mode === 'lab' ? this.bins.map(bin => ({ id: bin.id, label: bin.label, ...this.normalized(bin.x, bin.y), width: bin.width / this.viewW, height: bin.height / this.viewH })) : [],
+      character: this.persona === 'teacher' ? { ...this.normalized(this.character.x, this.character.y), faceX: face.x, faceY: face.y, faceRadius: this.character.faceRadius / this.viewW } : undefined,
+      assetStatus: { teacher: this.teacherAssetStatus } };
+  }
+
+  layoutQueue() {
+    if (!this.queue) return;
+    this.queue.forEach(item => { item.x = NaN; item.y = NaN; });
+    this.queue.filter(item => !item.gone).slice(0, 3).forEach((item, i) => { const travel = this.reducedMotion ? 0 : Math.sin(this.time * 0.72) * 18; item.x = this.mobile ? 400 : 204 + i * 198 + travel; item.y = this.mobile ? this.H * 0.29 + i * 150 + travel : this.H * 0.49; });
+  }
+
+  mouseSpots() {
+    const spots = this.mobile ? [[244, this.H * 0.32], [554, this.H * 0.32], [244, this.H * 0.58], [554, this.H * 0.58]] : [[219, 243], [584, 243], [307, 343], [505, 343]];
+    return spots.map(([x, y], id) => ({ x, y, id }));
+  }
+
+  researcherBounds() {
+    const scale = this.mode === 'mice' ? (this.mobile ? 1.35 : 0.73) : (this.mobile ? 1.5 : 0.92);
+    const x = this.mode === 'mice' ? 400 : this.researcher.x, y = this.mode === 'mice' ? this.H - 67 : this.researcher.y;
+    return { x, y: y - 88 * scale, width: 110 * scale, height: 190 * scale, faceX: x, faceY: y - 142 * scale, scale };
+  }
+
+  researcherTarget() {
+    const body = this.researcherBounds(), face = this.normalized(body.faceX, body.faceY);
+    return { id: 98, kind: 'researcher', ...this.normalized(body.x, body.y), width: body.width / this.viewW, height: body.height / this.viewH, radius: body.height / (2 * this.viewW), faceX: face.x, faceY: face.y };
+  }
+
+  researcherAt(point) {
+    const body = this.researcherBounds();
+    return Math.abs(point.x - body.x) < body.width / 2 && Math.abs(point.y - body.y) < body.height / 2;
+  }
+
+  itemAt(items, point, { width = 130, height = 136, anchor = 44 } = {}) {
+    return items.filter(item => !item.gone).find(item => Math.abs(item.x - point.x) < width / 2 && Math.abs(item.y - anchor - point.y) < height / 2) || null;
   }
 
   setMode(mode) {
@@ -138,11 +219,14 @@ export class Universe {
       satellites: this.persona === 'doctor' ? ['夜班', '排班', '文书'] : this.persona === 'teacher' ? ['备课', '批改', '表格'] : ['DDL', '组会', '返修'],
       sceneTag: { lab: '抓住它，往外一甩', mentor: '把消息拖进这里，休息一会儿', earth: '按住，再松手', mice: '点一点，一起放松' }[scene],
       endingTag: { lab: '今天的工作先放下。', mentor: '已开启免打扰。', earth: '留一点时间，给自己。', mice: '今天辛苦了，一起歇一会儿。' }[scene],
-      partyLabel: this.persona === 'doctor' ? '茶歇时间' : this.persona === 'teacher' ? '下课啦' : '下班派对'
+      partyLabel: this.persona === 'doctor' ? '行政队列清空' : this.persona === 'teacher' ? '今天不加任务' : '鼠鼠下班啦',
+      binLabels: ['标书', '检查', 'DRG'], documentCategories: ['标书', '检查', 'DRG', '标书', '检查', 'DRG'],
+      burdens: ['非教学报表', '迎检材料', '打卡截图', '临时会议', '重复录入', '家校群', '评比台账'],
+      queueLabels: ['标书格式', '检查台账', 'DRG说明', '预算修改', '汇报材料', '复核表', '签字流程', '盖章申请', '检查清单', '临时会议', '补充附件', '重复录入']
     };
     const supplied = this.scenes?.[scene]?.paint || {};
     const merged = { ...fallback, ...supplied };
-    for (const field of ['equipmentKinds', 'equipmentNames', 'cards', 'replies', 'satellites']) {
+    for (const field of ['equipmentKinds', 'equipmentNames', 'cards', 'replies', 'satellites', 'binLabels', 'documentCategories', 'burdens', 'queueLabels']) {
       if (!Array.isArray(merged[field]) || merged[field].length < fallback[field].length) merged[field] = fallback[field];
     }
     return merged;
@@ -157,7 +241,7 @@ export class Universe {
     if (gesture?.active) {
       if (!this.gesture?.active) {
         const point = this.point(gesture.startX ?? gesture.x, gesture.startY ?? gesture.y);
-        this.dragTarget = this.closest(this.mode === 'lab' ? this.equipment : this.cards, point.x, point.y);
+        this.dragTarget = this.mode === 'lab' ? this.itemAt(this.equipment, point) : this.itemAt(this.cards, point, { width: this.mobile ? 340 : 214, height: this.mobile ? 108 : 86, anchor: 0 });
       }
       this.gesture = { ...gesture, active: true };
       this.charge = clamp(gesture.charge ?? this.charge);
@@ -176,39 +260,54 @@ export class Universe {
   }
 
   hit(x = 0.5, y = 0.5, options = {}) {
-    if (this.disposed || this.paused || this.bursting) return;
+    if (this.disposed || this.paused || this.bursting) return { applied: false, interaction: 'unavailable' };
     if (options.tool) this.setTool(options.tool);
     const point = this.point(x, y);
     this.aim = { x: clamp(x), y: clamp(y) };
-    this.hits++;
     this.ended = false;
-    this.shake = this.reducedMotion ? 0 : 0.13 + this.intensity * 0.025;
-    if (this.mode === 'lab') this.hitLab(point, options);
-    if (this.mode === 'mentor') this.hitMentor(point, options);
-    if (this.mode === 'earth') this.hitEarth(point, options);
-    if (this.mode === 'mice') this.hitMice(point, options);
+    let feedback;
+    if (this.mode === 'lab') feedback = this.hitLab(point, options);
+    if (this.mode === 'mentor') feedback = this.hitMentor(point, options);
+    if (this.mode === 'earth') feedback = this.hitEarth(point, options);
+    if (this.mode === 'mice') feedback = this.hitMice(point, options);
+    if (feedback?.applied) { this.hits++; this.shake = this.reducedMotion ? 0 : 0.10 + this.intensity * 0.02; }
+    this.lastInteraction = feedback;
     this.dragTarget = null;
     this.gesture = null;
-    this.trim();
-    this.draw();
-    this.wake();
+    this.trim(); this.draw(); this.wake();
+    return feedback || { applied: false, interaction: 'empty' };
   }
 
   hitLab(point, options) {
-    const target = this.dragTarget && !this.equipment[this.dragTarget.id]?.gone ? this.equipment[this.dragTarget.id] : this.closest(this.equipment, point.x, point.y);
-    if (!target) { this.ring(point.x, point.y, C.lime); this.emit(point.x, point.y, 16, 'spark'); return; }
+    if (this.persona === 'phd' && !options.autoTarget) {
+      if (Math.hypot(point.x - this.labMouse.x, point.y - (this.labMouse.y - 25)) < this.labMouse.radius) return this.petMouse(this.labMouse, false);
+      if (this.researcherAt(point)) return this.restResearcher();
+    }
+    const target = options.autoTarget ? this.equipment.find(item => !item.gone) : this.dragTarget && !this.equipment[this.dragTarget.id]?.gone ? this.equipment[this.dragTarget.id] : this.itemAt(this.equipment, point);
+    if (!target) return { applied: false, message: { phd: '点一件仪器，或者摸摸旁边的鼠鼠。', doctor: '抓住一份纸张，拖进对应的分类箱。', teacher: '点一份额外任务，把它送回发任务的人。' }[this.persona], interaction: 'empty' };
     const item = this.equipment[target.id];
-    const releasedAt = Number.isFinite(options.endX) && Number.isFinite(options.endY) ? this.point(options.endX, options.endY) : item;
+    let releasedAt = Number.isFinite(options.endX) && Number.isFinite(options.endY) ? this.point(options.endX, options.endY) : item;
+    if (this.persona === 'doctor') {
+      const category = this.paintFor('lab').documentCategories[item.id % 6];
+      const correct = this.bins.find(bin => bin.label === category) || this.bins[item.id % 3];
+      if (options.autoTarget) releasedAt = correct;
+      const bin = this.bins.find(candidate => Math.abs(releasedAt.x - candidate.x) <= candidate.width / 2 && Math.abs(releasedAt.y - candidate.y) <= candidate.height / 2);
+      if (!bin || bin.id !== correct.id) {
+        this.effects.push({ kind: 'sort-wrong', x: item.x, y: item.y - 100, age: 0, life: 1.3, text: `放进「${correct.label}」箱` });
+        return { applied: false, gain: 0, message: `这份${this.paintFor('lab').equipmentNames[item.id]}归「${correct.label}」，拖进去就好。`, impact: '再分一次就好', interaction: 'sort-wrong', targetId: item.id };
+      }
+      item.gone = true;
+      this.flights.push({ kind: 'sorted', item: { ...item }, originX: item.x, originY: item.y - 45, x: item.x, y: item.y - 45, toX: bin.x, toY: bin.y, age: 0, life: this.reducedMotion ? 0.2 : 0.7, tool: this.tool });
+      this.effects.push({ kind: 'handoff', x: bin.x, y: bin.y - 15, age: 0, life: 0.9 });
+      this.ring(bin.x, bin.y, C.blue);
+      if (this.tool === 'rainbow') this.emit(bin.x, bin.y - 25, 20, 'confetti');
+      return { applied: true, gain: 1, message: `${this.paintFor('lab').equipmentNames[item.id]}，归好了。`, impact: `${correct.label} · 已归档`, interaction: 'sort-correct', targetId: item.id };
+    }
     item.gone = true;
-    if (this.persona === 'doctor' || this.persona === 'teacher') {
-      const doctor = this.persona === 'doctor';
-      this.effects.push({ kind: doctor ? 'handoff' : item.kind === 'board' ? 'erase' : 'fold', x: releasedAt.x, y: releasedAt.y - 38, age: 0, life: doctor ? 0.95 : 0.8 });
-      this.ring(releasedAt.x, releasedAt.y - 30, doctor ? C.gold : C.purple);
-      this.splitEquipment(item, releasedAt, false, doctor ? 0.16 : 0.08);
-      this.emit(releasedAt.x, releasedAt.y - 30, 12 + this.intensity * 5, doctor ? 'page' : item.kind === 'board' ? 'chalk' : 'crane');
-      if (this.tool === 'gravity') this.effects.push({ kind: 'gravity', x: releasedAt.x, y: releasedAt.y - 35, age: 0, life: 0.7 });
-      if (this.tool === 'rainbow') this.splashes.push({ x: releasedAt.x, y: releasedAt.y + 5, color: doctor ? C.blue : C.purple });
-      return;
+    if (this.persona === 'teacher') {
+      this.launchPaper(this.paintFor('lab').equipmentNames[item.id], item.x, item.y - 44, 0, false);
+      this.emit(item.x, item.y - 35, 9, 'page');
+      return { applied: true, gain: 1, message: '这件额外任务，送回发任务的人。', impact: '额外任务，退回！', interaction: 'burden-return', targetId: item.id };
     }
     this.ring(releasedAt.x, releasedAt.y - 30, this.tool === 'rainbow' ? C.pink : C.lime);
     this.emit(releasedAt.x, releasedAt.y - 30, 28 + this.intensity * 12, this.tool === 'rainbow' ? 'paint' : 'metal');
@@ -220,86 +319,157 @@ export class Universe {
       this.effects.push({ kind: 'rainbow', x: releasedAt.x, y: releasedAt.y - 60, age: 0, life: 0.7 });
     } else {
       const fling = options.fling;
-      const vx = fling ? clamp(fling.dx, -2, 2) * this.viewW : (item.x < 400 ? -1 : 1) * (160 + this.intensity * 65);
-      const vy = fling ? clamp(fling.dy, -2, 2) * this.viewH - 110 : -220;
-      this.flights.push({ kind: 'equipment', item: { ...item }, x: releasedAt.x, y: releasedAt.y, vx, vy, age: 0, life: 1.45, rotation: 0 });
+      this.flights.push({ kind: 'equipment', item: { ...item }, x: releasedAt.x, y: releasedAt.y, vx: fling ? clamp(fling.dx, -2, 2) * this.viewW : (item.x < 400 ? -1 : 1) * (160 + this.intensity * 65), vy: fling ? clamp(fling.dy, -2, 2) * this.viewH - 110 : -220, age: 0, life: 1.45, rotation: 0 });
       this.effects.push({ kind: 'hammer', x: releasedAt.x, y: releasedAt.y - 45, age: 0, life: 0.38 });
       if (!fling) this.splitEquipment(item, releasedAt, false);
     }
     if (this.splashes.length > 8) this.splashes.shift();
+    return { applied: true, gain: 1, interaction: options.fling ? 'instrument-fling' : 'instrument-hit', targetId: item.id };
+  }
+
+  petMouse(mouse, count = true, gain = 1) {
+    this.mouseReactions.push({ id: mouse.id, x: mouse.x, y: mouse.y, age: 0, life: 1.2, tool: this.mode === 'mice' ? this.tool : 'snacks' });
+    this.effects.push({ kind: this.mode === 'mice' ? this.tool : 'bubbles', x: mouse.x, y: mouse.y - 33, age: 0, life: 1.2 });
+    this.emit(mouse.x, mouse.y - 36, 12, this.tool === 'bubbles' ? 'bubble' : 'confetti');
+    const name = this.mode === 'mice' ? { disco: 'mouse-dance', bubbles: 'mouse-bubble', snacks: 'mouse-feed' }[this.tool] : 'mouse-pet';
+    return { applied: count, gain: count ? gain : 0, message: this.mode === 'mice' ? '鼠鼠收到啦，开心得晃起了耳朵。' : '鼠鼠蹭了蹭你的手。先陪它歇一会儿。', impact: this.tool === 'snacks' ? '给鼠鼠加一颗小零食' : '鼠鼠也松了一口气', interaction: name, targetId: mouse.id };
+  }
+
+  restResearcher() {
+    this.researcherReaction = 1.8;
+    const x = this.mode === 'mice' ? 400 : this.researcher.x;
+    this.effects.push({ kind: 'researcher-rest', x, y: this.mode === 'mice' ? this.H - 150 : this.researcher.y - 115, age: 0, life: 1.8 });
+    return { applied: false, gain: 0, message: '博士生把肩膀放下来，喝了口水。今天已经很努力了。', impact: '博士生也休息一下', interaction: 'researcher-rest', targetId: 98 };
   }
 
   hitMentor(point, options) {
-    const selected = this.dragTarget && !this.cards[this.dragTarget.id]?.gone ? this.cards[this.dragTarget.id] : this.closest(this.cards, point.x, point.y);
-    if (!selected) { this.emit(this.core.x, this.core.y, 18, 'letter', '已下班'); return; }
+    if (this.persona === 'phd' && !options.autoTarget) {
+      const avatar = Math.hypot(point.x - (this.core.x - 134), point.y - (this.core.y - 65)) < 30 ? '导师' : Math.hypot(point.x - (this.core.x + 134), point.y - (this.core.y - 65)) < 30 ? '博士生' : null;
+      if (avatar) { this.effects.push({ kind: 'researcher-rest', x: point.x, y: point.y - 30, age: 0, life: 1.4 }); return { applied: false, gain: 0, message: avatar === '导师' ? '导师头像点了点头：今天先到这里。' : '博士生放下手机：明天再继续。', impact: '今天先到这里', interaction: avatar === '导师' ? 'mentor-pause' : 'researcher-rest', targetId: avatar === '导师' ? 97 : 98 }; }
+    }
+    const selected = options.autoTarget ? this.cards.find(card => !card.gone) : this.dragTarget && !this.cards[this.dragTarget.id]?.gone ? this.cards[this.dragTarget.id] : this.itemAt(this.cards, point, { width: this.mobile ? 340 : 214, height: this.mobile ? 108 : 86, anchor: 0 });
+    if (!selected) return { applied: false, message: '点一条消息，把它收起来。', interaction: 'empty' };
     const card = this.cards[selected.id];
     const releasedAt = Number.isFinite(options.endX) && Number.isFinite(options.endY) ? this.point(options.endX, options.endY) : card;
     card.gone = true;
+    if (this.persona === 'teacher') {
+      this.launchPaper(card.text, releasedAt.x, releasedAt.y);
+      return { applied: true, gain: 1, message: `「${card.text}」退回给发任务的人。`, impact: '额外通知，退回！', interaction: 'notification-face', targetId: card.id };
+    }
     const replies = this.paintFor('mentor').replies;
     this.replies.push({ text: replies[card.id], id: card.id });
     this.ring(releasedAt.x, releasedAt.y, this.tool === 'mute' ? C.blue : C.purple);
     this.flights.push({ kind: this.tool === 'reply' ? 'plane' : 'card', item: { ...card }, x: releasedAt.x, y: releasedAt.y, originX: releasedAt.x, originY: releasedAt.y, age: 0, life: this.reducedMotion ? 0.25 : 1.0, rotation: 0, muted: this.tool === 'mute' });
     if (this.tool === 'mute') this.effects.push({ kind: 'mute', x: releasedAt.x, y: releasedAt.y, age: 0, life: 1.0 });
     else this.emit(releasedAt.x, releasedAt.y, 25 + this.intensity * 9, 'letter', card.text);
+    return { applied: true, gain: 1, interaction: 'notification-clear', targetId: card.id };
   }
 
   hitEarth(point, options) {
-    const globe = this.globe;
-    let dx = point.x - globe.x, dy = point.y - globe.y;
+    if (this.persona === 'teacher') return this.hitTeacher(point, options);
+    const g = this.globe;
+    if (!options.autoTarget && Math.hypot(point.x - g.x, point.y - g.y) > g.r * 1.16) return { applied: false, gain: 0, message: this.persona === 'doctor' ? '对着 DRG 纸堆点一下，或按住蓄力。' : '对着 DDL 球点一下，或按住蓄力。', interaction: 'empty' };
+    let dx = point.x - g.x, dy = point.y - g.y;
     const distance = Math.max(1, Math.hypot(dx, dy));
-    if (distance > globe.r * 0.88) { dx *= globe.r * 0.88 / distance; dy *= globe.r * 0.88 / distance; }
-    const x = globe.x + dx, y = globe.y + dy;
+    if (distance > g.r * 0.88) { dx *= g.r * 0.88 / distance; dy *= g.r * 0.88 / distance; }
+    const x = g.x + dx, y = g.y + dy;
     const power = 1 + clamp(options.charge ?? this.charge) * 2 + this.intensity * 0.2;
-    this.cracks.push({ x: dx / globe.r, y: dy / globe.r, angle: Math.atan2(dy, dx), power });
+    this.cracks.push({ x: dx / g.r, y: dy / g.r, angle: Math.atan2(dy, dx), power });
     if (this.cracks.length > 16) this.cracks.shift();
     this.effects.push({ kind: this.tool, x, y, age: 0, life: this.reducedMotion ? 0.3 : 0.75, power });
-    this.emit(x, y, 22 + Math.round(power * 15), this.tool === 'blackhole' ? 'void' : this.persona === 'teacher' ? 'page' : this.persona === 'doctor' ? 'clock' : 'earth');
-    this.ring(x, y, this.tool === 'blackhole' ? C.purple : C.gold);
-    this.charge = 0;
+    this.emit(x, y, 22 + Math.round(power * 15), this.persona === 'doctor' ? 'page' : 'earth');
+    this.ring(x, y, C.gold); this.charge = 0;
+    return { applied: true, interaction: this.persona === 'doctor' ? 'drg-break' : 'ddl-hit', targetId: 0 };
   }
 
   hitMice(point, options) {
-    this.guests = Math.min(10, this.guests + 1);
-    this.effects.push({ kind: this.tool, x: point.x, y: point.y, age: 0, life: this.reducedMotion ? 0.3 : 1.4, combo: options.combo || 1 });
-    this.ring(point.x, point.y, this.tool === 'bubbles' ? C.blue : C.pink);
-    this.emit(point.x, point.y, 18 + this.intensity * 9, this.tool === 'bubbles' ? 'bubble' : 'confetti');
+    if (this.persona === 'teacher') return this.hitTeacher(point, options);
+    if (this.persona === 'doctor') {
+      this.layoutQueue();
+      const item = options.autoTarget ? this.queue.find(paper => !paper.gone) : this.itemAt(this.queue, point, { width: 154, height: 120, anchor: 0 });
+      if (!item) return { applied: false, gain: 0, message: '点一张传送带上的行政纸张。', interaction: 'empty' };
+      item.gone = true;
+      this.flights.push({ kind: 'queued', item: { ...item }, x: item.x, y: item.y, originX: item.x, originY: item.y, age: 0, life: 0.65, tool: this.tool, toX: 684, toY: this.mobile ? this.H - 175 : 319 });
+      this.emit(item.x, item.y, 12, 'page');
+      if (this.tool === 'disco') this.effects.push({ kind: 'handoff', x: item.x, y: item.y, age: 0, life: 0.65 });
+      else if (this.tool === 'bubbles') this.ring(item.x, item.y, C.blue);
+      else this.ring(659, this.mobile ? this.H - 127 : this.H * 0.60 + 89, C.lime);
+      this.layoutQueue();
+      return { applied: true, gain: 1, message: `${item.text}，收下了。队列又短了一点。`, impact: '收走一件行政任务', interaction: 'admin-queue-clear', targetId: item.id };
+    }
+    if (!options.autoTarget && this.researcherAt(point)) return this.restResearcher();
+    const mice = this.mouseSpots();
+    const mouse = options.autoTarget ? mice[this.hits % mice.length] : mice.find(item => Math.hypot(point.x - item.x, point.y - (item.y - 28)) < (this.mobile ? 82 : 54));
+    if (!mouse) return { applied: false, gain: 0, message: '点到鼠鼠，它才会回应你。', interaction: 'empty' };
+    return this.petMouse(mouse, true, options.gain || 1);
+  }
+
+  hitTeacher(point, options) {
+    const face = this.character;
+    const aim = Number.isFinite(options.endX) && Number.isFinite(options.endY) ? this.point(options.endX, options.endY) : point;
+    if (!options.autoTarget && Math.hypot(aim.x - face.faceX, aim.y - face.faceY) > face.faceRadius * 1.4) return { applied: false, gain: 0, message: '对准拿着话筒的人，把额外任务送回去。', interaction: 'paper-miss' };
+    const labels = this.paintFor().burdens;
+    const label = labels[this.hits % labels.length];
+    this.launchPaper(label, this.mobile ? 142 : 132, this.H - (this.mobile ? 200 : 86));
+    this.charge = 0;
+    return { applied: true, gain: this.mode === 'mice' ? 1 : undefined, message: `「${label}」送回了发任务的人。`, impact: `${label} · 退回！`, interaction: 'paper-face', targetId: 0 };
+  }
+
+  launchPaper(text, x, y, delay = 0, big = false) {
+    const face = this.character;
+    this.flights.push({ kind: 'burden', shape: ['laser', 'reply'].includes(this.tool) ? 'plane' : ['blackhole', 'gravity', 'snacks'].includes(this.tool) ? 'bundle' : 'ball', text, originX: x, originY: y, x, y, toX: face.faceX, toY: face.faceY, age: 0, delay, life: this.reducedMotion ? 0.26 : big ? 1.45 : 1.05, contact: false, rotation: 0 });
   }
 
   burst(options = {}) {
     if (this.disposed || this.paused || this.bursting) return;
     if (options.tool) this.setTool(options.tool);
-    this.bursting = true;
-    this.burstAge = 0;
-    this.ended = false;
-    this.charge = 0;
-    this.shake = this.reducedMotion ? 0 : 0.20 + this.intensity * 0.055;
-    if (this.mode === 'lab') {
+    this.bursting = true; this.burstAge = 0; this.ended = false; this.charge = 0;
+    this.shake = this.reducedMotion ? 0 : 0.20 + this.intensity * 0.045;
+    if (this.persona === 'teacher') {
+      this.equipment.forEach(item => { item.gone = true; });
+      this.cards.forEach(card => { card.gone = true; });
+      const labels = this.mode === 'mentor' ? this.paintFor('mentor').cards : this.paintFor().burdens;
+      for (let i = 0; i < 14; i++) this.launchPaper(labels[i % labels.length], i % 2 ? 675 : 123, this.H - 115 - i % 3 * 65, this.reducedMotion ? 0 : i * 0.072, true);
+      this.splitPaperStack(this.character.faceX, this.character.faceY + 30, true);
+      this.emit(this.character.faceX, this.character.faceY, 65, 'page', '', true);
+      this.ring(this.character.faceX, this.character.faceY, C.gold, true);
+    } else if (this.mode === 'lab') {
       this.equipment.forEach((item, i) => {
         item.gone = true;
-        this.splitEquipment(item, item, true, this.persona === 'doctor' ? 0.16 + i * 0.025 : i * 0.025);
-        this.emit(item.x, item.y - 20, this.persona === 'phd' ? 9 : 17, this.persona === 'doctor' ? 'page' : this.persona === 'teacher' ? 'crane' : 'metal', '', true);
+        this.splitEquipment(item, item, true, i * 0.025);
+        this.emit(item.x, item.y - 20, this.persona === 'phd' ? 9 : 17, this.persona === 'doctor' ? 'page' : 'metal', '', true);
       });
-      this.ring(400, this.mobile ? this.H * 0.5 : 270, C.lime, true);
-      if (this.persona === 'doctor') this.effects.push({ kind: 'handoff', x: 400, y: this.H * 0.48, age: 0, life: 1.1, large: true });
-      if (this.persona === 'teacher') this.effects.push({ kind: 'fold', x: 400, y: this.H * 0.48, age: 0, life: 1.1, large: true });
+      this.ring(400, this.H * 0.51, C.lime, true);
+      if (this.persona === 'doctor') this.effects.push({ kind: 'handoff', x: 400, y: this.H * 0.49, age: 0, life: 1.1, large: true });
     } else if (this.mode === 'mentor') {
       this.cards.forEach(card => { if (!card.gone) { card.gone = true; this.flights.push({ kind: 'card', item: { ...card }, x: card.x, y: card.y, originX: card.x, originY: card.y, age: 0, life: 1.3, rotation: 0 }); } });
       this.replies = [{ text: this.paintFor('mentor').replies[0], id: 0 }];
-      this.emit(this.core.x, this.core.y, 90, 'letter', '今天先到这里');
-      this.ring(this.core.x, this.core.y, C.purple, true);
+      this.emit(this.core.x, this.core.y, 90, 'letter', '今天先到这里'); this.ring(this.core.x, this.core.y, C.purple, true);
     } else if (this.mode === 'earth') {
-      this.splitWorld();
-      this.emit(this.globe.x, this.globe.y, 55, this.persona === 'teacher' ? 'page' : this.persona === 'doctor' ? 'clock' : 'earth', '', true);
+      if (this.persona === 'doctor') this.splitPaperStack(this.globe.x, this.globe.y, true); else this.splitWorld();
+      this.emit(this.globe.x, this.globe.y, 55, this.persona === 'doctor' ? 'page' : 'earth', '', true);
       this.ring(this.globe.x, this.globe.y, C.blue, true);
+    } else if (this.persona === 'doctor') {
+      this.queue.forEach(item => { item.gone = true; });
+      this.splitPaperStack(400, this.H * 0.48, true);
+      this.emit(400, this.H * 0.44, 90, 'page', '', true);
+      this.ring(400, this.H * 0.5, C.blue, true);
     } else {
-      this.guests = 10;
-      this.emit(400, this.H * 0.42, 230, 'confetti', '', true);
+      this.mouseSpots().forEach(mouse => this.petMouse(mouse, false));
+      this.emit(400, this.H * 0.42, 180, 'confetti', '', true);
       this.effects.push({ kind: 'festival', x: 400, y: this.H * 0.42, age: 0, life: this.burstDuration });
       this.ring(400, this.H * 0.5, C.pink, true);
     }
-    const center = this.mode === 'earth' ? this.globe : this.mode === 'mentor' ? this.core : { x: 400, y: this.H * 0.52 };
+    const center = this.persona === 'teacher' ? { x: this.character.faceX, y: this.character.faceY } : this.mode === 'earth' ? this.globe : this.mode === 'mentor' ? this.core : { x: 400, y: this.H * 0.52 };
     this.explosions.push({ x: center.x, y: center.y, age: 0, life: this.burstDuration, power: this.intensity / 2, radius: this.mode === 'earth' ? this.globe.r : this.mobile ? 170 : 120 });
     this.trim(); this.draw(); this.wake();
+  }
+
+  splitPaperStack(x, y, big = true) {
+    for (let i = 0; i < 7; i++) {
+      const item = { kind: 'document', id: i % 6, x: x + (i % 3 - 1) * 65, y: y + Math.floor(i / 3) * 34 };
+      this.splitEquipment(item, item, big, i * 0.026);
+    }
   }
 
   reset() { this.resetState(); this.layout(); this.draw(); this.wake(); }
@@ -380,6 +550,9 @@ export class Universe {
     this.lastTime = Number.isFinite(now) ? now : null;
     this.time += dt;
     this.shake = Math.max(0, this.shake - elapsed);
+    this.researcherReaction = Math.max(0, this.researcherReaction - elapsed);
+    this.faceReaction = Math.max(0, this.faceReaction - elapsed);
+    this.mouseReactions = this.mouseReactions.filter(reaction => { reaction.age += elapsed; return reaction.age < reaction.life; });
     this.particles = this.particles.filter(p => {
       p.age += elapsed;
       if (p.age >= (p.delay || 0)) { p.x += p.vx * dt; p.y += p.vy * dt; p.vy += p.gravity * dt; p.rotation += p.spin * dt; }
@@ -399,7 +572,14 @@ export class Universe {
     this.flights = this.flights.filter(flight => {
       flight.age += elapsed;
       if (flight.kind === 'equipment') { flight.x += flight.vx * dt; flight.y += flight.vy * dt; flight.vy += 110 * dt; flight.rotation += dt * 2.2; }
-      return flight.age < flight.life;
+      if (flight.kind === 'burden' && !flight.contact && flight.age - (flight.delay || 0) >= flight.life * 0.46) {
+        flight.contact = true; this.faceReaction = 0.45;
+        this.stickers.push({ text: flight.text, x: flight.toX + (this.stickers.length % 2 ? 1 : -1) * 28, y: flight.toY + 28 + this.stickers.length % 3 * 18, tilt: (this.stickers.length % 2 ? 1 : -1) * 0.1 });
+        if (this.stickers.length > 5) this.stickers.shift();
+        this.effects.push({ kind: 'paper-contact', x: flight.toX, y: flight.toY, age: 0, life: 0.45 });
+        this.emit(flight.toX, flight.toY, 7, 'page');
+      }
+      return flight.age < flight.life + (flight.delay || 0);
     });
     if (this.bursting) {
       this.burstAge += elapsed;
@@ -410,7 +590,7 @@ export class Universe {
       }
     }
     this.draw();
-    if (!this.paused && !this.hidden && (!this.reducedMotion || this.particles.length || this.effects.length || this.flights.length || this.bursting)) this.raf = requestAnimationFrame(this.tick);
+    if (!this.paused && !this.hidden && (!this.reducedMotion || this.particles.length || this.effects.length || this.flights.length || this.mouseReactions.length || this.researcherReaction || this.bursting)) this.raf = requestAnimationFrame(this.tick);
   }
 
   ring(x, y, color, big = false) { this.rings.push({ x, y, color, age: 0, life: this.reducedMotion ? 0.25 : big ? 1.1 : 0.45, big }); }
@@ -507,94 +687,140 @@ export class Universe {
   }
 
   background() {
-    const c = this.ctx; const h = this.H;
-    const g = c.createLinearGradient(0, 0, 800, h);
-    g.addColorStop(0, '#354a56'); g.addColorStop(0.58, '#3d4c57'); g.addColorStop(1, '#4b505e');
-    c.fillStyle = g; c.fillRect(-this.offsetX, -this.offsetY, this.viewW, this.viewH);
-    this.glow(400, h * 0.55, 370, this.mode === 'mice' ? '#d4adb321' : this.mode === 'mentor' ? '#b3a9c628' : '#bac8a118');
-    this.stars.forEach(star => { c.globalAlpha = this.reducedMotion ? 0.4 : 0.28 + (Math.sin(this.time * 0.8 + star.phase) + 1) * 0.18; this.ellipse(star.x * this.viewW - this.offsetX, star.y * this.viewH - this.offsetY, star.r, star.r, '#d7e7dd'); });
-    c.globalAlpha = 1;
-    c.save(); c.setLineDash([2, 8]); this.ellipse(400, h * 0.53, 368, Math.min(173, h * 0.27), null, '#849dba18', 1); c.restore();
-    [[65, 70], [730, h - 103], [697, 62]].forEach(([x, y]) => { this.line([[x - 4, y], [x + 4, y]], '#b3a9c680', 1); this.line([[x, y - 4], [x, y + 4]], '#b3a9c680', 1); });
-    if (this.offsetX > 90) {
-      this.ellipse(-this.offsetX + 97, h * 0.29, 34, 34, '#72648b', '#b3a9c66b', 1);
-      this.ellipse(-this.offsetX + 97, h * 0.29, 61, 15, null, '#b3a9c659', 3, -0.25);
-      this.ellipse(800 + this.offsetX - 88, h * 0.72, 24, 24, '#355063', '#a7c3cd5a', 1);
-      this.ellipse(800 + this.offsetX - 93, h * 0.70, 7, 5, '#608093');
+    const c = this.ctx, h = this.H, floor = h * 0.76;
+    const palette = { phd: ['#f3f0e7', '#e0e8df', '#c8d6ce'], doctor: ['#e8f1f0', '#d8e7e3', '#bccfca'], teacher: ['#f2eadb', '#e6dfcd', '#d6c8af'] }[this.persona];
+    const gradient = c.createLinearGradient(0, 0, 0, h);
+    gradient.addColorStop(0, palette[0]); gradient.addColorStop(0.76, palette[1]); gradient.addColorStop(1, palette[2]);
+    c.fillStyle = gradient; c.fillRect(-this.offsetX, -this.offsetY, this.viewW, this.viewH);
+    this.rect(-this.offsetX, floor, this.viewW, this.viewH - floor, 0, palette[2], null);
+    this.line([[-this.offsetX, floor], [800 + this.offsetX, floor]], '#afbeb4', 3);
+    for (let i = -5; i < 10; i++) this.line([[i * 170, floor], [400 + (i * 170 - 400) * 1.8, h]], '#a4b2a530', 1.4);
+    this.window(68, this.mobile ? 108 : 67, 171, this.mobile ? 173 : 132);
+    if (this.persona === 'phd') {
+      this.rect(454, 87, 242, this.mobile ? 153 : 117, 10, '#d8dfd4', '#adbeb4', 2);
+      this.rect(469, 99, 211, this.mobile ? 97 : 67, 3, '#edf2e7', '#a9bcb7', 1.2);
+      this.line([[482, 185], [670, 185]], '#91a79e', 3);
+      for (let i = 0; i < 6; i++) { this.rect(486 + i * 29, 133, 14, 31, 4, [C.blue, C.lime, C.purple][i % 3], '#869f98', 1); this.rect(484 + i * 29, 128, 18, 6, 2, '#77968b', null); }
+      this.rect(294, 76, 106, 61, 7, '#e8e1d0', '#b8b7a3', 1.5);
+      this.label('实验室', 347, 105, this.fontSize(15, 12), '#557468');
+      this.label('今天也慢慢来', 347, 122, this.fontSize(10, 10), '#667f72');
+    } else if (this.persona === 'doctor') {
+      this.rect(582, 84, 147, floor - 87, 9, '#cbded9', '#91aaa4', 2);
+      this.rect(597, 100, 117, 67, 4, '#e6f0e9', '#a6beb4', 1);
+      this.label('医院 · 文书站', 654, 130, this.fontSize(13, 11), '#42635d');
+      this.line([[654, 143], [654, 155]], '#99b8ab', 3); this.line([[648, 149], [660, 149]], '#99b8ab', 3);
+      this.ellipse(698, floor - 110, 5, 5, '#66857d');
+      this.rect(290, 87, 237, 82, 8, '#f0f2e9', '#b0c3b7', 1.5);
+      this.label('待办不等于你的全部', 408, 122, this.fontSize(15, 12), '#59726a');
+      this.line([[315, 145], [494, 145]], '#c5d0bd', 3);
+      this.rect(-this.offsetX, floor - 23, this.viewW, 16, 0, '#a9c2b8', null);
+    } else {
+      this.rect(287, 81, 278, this.mobile ? 178 : 139, 5, '#bea581', '#a08e70', 2);
+      this.rect(298, 91, 256, this.mobile ? 157 : 119, 2, '#718f7e', '#4f7162', 1.5);
+      this.label('今天的课，讲完了。', 426, this.mobile ? 144 : 131, this.fontSize(this.mobile ? 28 : 20, 13), '#eceddb');
+      this.label('额外任务，下课后退回。', 426, this.mobile ? 185 : 161, this.fontSize(this.mobile ? 20 : 13, 11), '#e0e5cf');
+      this.line([[315, this.mobile ? 224 : 191], [528, this.mobile ? 224 : 191]], '#e2e3d1', 2);
+      this.rect(646, 93, 78, 101, 6, '#e5dcc4', '#b8aa8b', 1);
+      this.label('课程表', 685, 121, this.fontSize(13, 11), '#796e56');
+      for (let i = 0; i < 4; i++) this.line([[657, 135 + i * 13], [713, 135 + i * 13]], '#b8af92', 1.5);
+      this.rect(51, floor - 43, 165, 25, 5, '#b4a284', '#8d826a', 1); this.line([[72, floor - 18], [64, h]], '#a19378', 8); this.line([[197, floor - 18], [205, h]], '#a19378', 8);
     }
+  }
+
+  window(x, y, width, height) {
+    this.rect(x, y, width, height, 6, '#d7e6e5', '#afc6bf', 4);
+    this.rect(x + 7, y + 7, width - 14, height - 14, 2, '#dfece5', null);
+    this.ellipse(x + width * 0.72, y + height * 0.30, 18, 18, '#f0e6c5');
+    this.path([[x + 7, y + height - 28], [x + 43, y + height - 51], [x + 86, y + height - 22], [x + width - 7, y + height - 47], [x + width - 7, y + height - 7], [x + 7, y + height - 7]], '#b7ceaf', null);
+    this.line([[x + width / 2, y + 3], [x + width / 2, y + height - 3]], '#afc6bf', 5); this.line([[x + 3, y + height / 2], [x + width - 3, y + height / 2]], '#afc6bf', 5);
+    this.rect(x - 9, y + height, width + 18, 9, 3, '#b0c3b5', null);
   }
 
   sceneLabels() {
     const size = this.fontSize(this.mobile ? 26 : 13, 14);
     const paint = this.paintFor();
-    this.label(paint.sceneTag, 400, this.mobile ? 49 : 33, size, '#e1e5e3', 'center', 500);
+    this.label(paint.sceneTag, 400, this.mobile ? 49 : 33, size, '#344a46', 'center', 500);
     if (this.ended) {
       const w = this.mobile ? 660 : 390;
-      this.rect(400 - w / 2, this.H - (this.mobile ? 87 : 60), w, this.mobile ? 55 : 35, 18, '#334c52e8', '#bac8a148', 1);
-      this.wrappedLabel(paint.endingTag, 400, this.H - (this.mobile ? 52 : 38), w - 28, this.fontSize(this.mobile ? 26 : 14, 12), C.white, 1);
+      this.rect(400 - w / 2, this.H - (this.mobile ? 87 : 60), w, this.mobile ? 55 : 35, 18, '#edf0e3e8', '#a5baa4', 1);
+      this.wrappedLabel(paint.endingTag, 400, this.H - (this.mobile ? 52 : 38), w - 28, this.fontSize(this.mobile ? 26 : 14, 12), '#344a46', 1);
     }
   }
 
   lab() {
-    const c = this.ctx;
-    if (this.mobile) {
-      this.equipment.forEach(item => {
-        this.platform(item.x, item.y + 21, 194, 49);
-        this.drawLabItem(item);
-      });
-      this.mouse(401, this.H - 127, 1.2, this.persona === 'teacher' ? 'teacher' : this.persona === 'doctor' ? 'doctor' : 'scientist');
-    } else {
-      this.platform(409, 326, 700, 138);
+    if (this.persona === 'doctor') { this.documentSorting(); return; }
+    if (this.persona === 'teacher') {
+      this.platform(this.mobile ? 243 : 235, this.mobile ? this.H * 0.59 : 345, this.mobile ? 382 : 394, this.mobile ? 357 : 151);
+      this.teacherCharacter();
       this.equipment.forEach(item => this.drawLabItem(item));
-      this.mouse(105, 321, 0.93, this.persona === 'teacher' ? 'teacher' : this.persona === 'doctor' ? 'doctor' : 'scientist');
+      return;
     }
-    this.splashes.forEach(splash => { this.ellipse(splash.x, splash.y + 10, 45, 10, `${splash.color}85`); for (let i = 0; i < 4; i++) this.ellipse(splash.x + i * 13 - 20, splash.y + Math.sin(i) * 9, 4, 3, splash.color); });
-    if (this.bursting || this.ended) {
-      const p = this.reducedMotion || this.ended ? 1 : clamp(this.burstAge / 1.9);
-      const x = this.mobile ? 401 : 109;
-      const y = this.mobile ? this.H - 150 - p * (this.H - 300) : 340 - p * 203;
-      this.rocket(x, y, this.mobile ? 1.3 : 1, true);
-      if (!this.reducedMotion && this.bursting) this.glow(x, y + 80, 70, '#bac8a145');
-    }
+    if (this.mobile) this.equipment.forEach(item => this.platform(item.x, item.y + 21, 194, 49));
+    else this.platform(409, 326, 700, 138);
+    this.equipment.forEach(item => this.drawLabItem(item));
+    this.researcherPerson(this.researcher.x, this.researcher.y, this.mobile ? 1.5 : 0.92);
+    this.interactiveMouse(this.labMouse.x, this.labMouse.y, this.mobile ? 1.32 : 0.77, 'scientist', 99);
+    this.splashes.forEach(splash => this.ellipse(splash.x, splash.y + 10, 45, 10, `${splash.color}85`));
+    this.label('摸摸鼠鼠', this.labMouse.x, this.labMouse.y + (this.mobile ? 71 : 39), this.fontSize(this.mobile ? 25 : 12, 11), '#566e63');
+  }
+
+  documentSorting() {
+    const h = this.H;
+    this.platform(400, this.mobile ? h * 0.58 : 287, 725, this.mobile ? h * 0.48 : 194);
+    this.bins.forEach(bin => {
+      const highlighted = this.gesture?.active && this.dragTarget && this.paintFor('lab').documentCategories[this.dragTarget.id] === bin.label;
+      this.rect(bin.x - bin.width / 2, bin.y - bin.height / 2, bin.width, bin.height, 13, highlighted ? '#d3dfbc' : ['#d9ddc4', '#c8dde0', '#d9cddd'][bin.id], '#78948a', highlighted ? 3 : 1.8);
+      this.rect(bin.x - bin.width / 2 + 8, bin.y - bin.height / 2 - 4, bin.width - 16, 12, 5, '#97aaa0', '#728c80', 1);
+      this.label(bin.label, bin.x, bin.y + 8, this.fontSize(this.mobile ? 30 : 21, 14), '#344e46');
+      const filed = this.equipment.filter(item => item.gone && this.paintFor('lab').documentCategories[item.id] === bin.label).length;
+      this.label(`${filed} / 2`, bin.x, bin.y + (this.mobile ? 35 : 29), this.fontSize(this.mobile ? 23 : 13, 11), '#5c776c');
+    });
+    this.equipment.forEach(item => this.drawLabItem(item));
   }
 
   platform(x, y, width, depth) {
     const left = x - width / 2, right = x + width / 2, d = depth / 2;
-    this.ellipse(x, y + 57, width * 0.43, 22, '#26394345');
-    this.path([[left, y - d], [right - 65, y - d - 20], [right, y + d - 20], [left + 65, y + d]], '#617781', '#9eacb0', 1.5);
-    this.path([[left + 65, y + d], [right, y + d - 20], [right, y + d], [left + 65, y + d + 20]], '#4b626e', '#899ba4', 1.5);
-    this.path([[left, y - d], [left + 65, y + d], [left + 65, y + d + 20], [left, y - d + 20]], '#546a75', '#899ba4', 1.5);
-    this.line([[left + 73, y + d + 13], [right - 8, y + d - 7]], '#b3a9c682', 2);
-    for (let i = 1; i < 5; i++) this.line([[left + width * i / 5, y - d - i * 3], [left + width * i / 5 + 65, y + d - i * 3]], '#7e92a026', 1);
+    this.ellipse(x, y + 57, width * 0.43, 22, '#526b5320');
+    this.path([[left, y - d], [right - 37, y - d - 16], [right, y + d - 16], [left + 37, y + d]], '#e2dccd', '#b2bbab', 1.5);
+    this.path([[left + 37, y + d], [right, y + d - 16], [right, y + d + 8], [left + 37, y + d + 24]], '#c6c9b6', '#9fab9a', 1.5);
+    this.path([[left, y - d], [left + 37, y + d], [left + 37, y + d + 24], [left, y - d + 24]], '#d0d1be', '#a4ad98', 1.5);
+    this.line([[left + 47, y + d + 13], [right - 8, y + d - 3]], '#b1bba2', 2);
   }
 
   drawLabItem(item) {
-    const dragging = this.gesture?.active && this.dragTarget?.id === item.id;
     if (item.gone) {
-      this.ellipse(item.x, item.y + 13, 36, 9, '#080f1890', '#60738045', 1);
-      for (let i = 0; i < 6; i++) this.path([[item.x - 30 + i * 12, item.y + 8], [item.x - 24 + i * 12, item.y + 4 + i % 3], [item.x - 19 + i * 12, item.y + 13]], this.persona === 'phd' ? (i % 2 ? '#92aab2' : '#bac8a1aa') : '#dddccfa0', null);
-      if (this.persona === 'teacher') this.paperCrane(item.x, item.y - 9, 0.36, -0.2, C.white);
-      if (this.persona === 'doctor') { this.rect(item.x - 18, item.y - 17, 36, 20, 2, '#ece5dca0', '#c9b5b680', 1); this.label('已交班', item.x, item.y - 3, 8, '#786970'); }
+      this.ellipse(item.x, item.y + 12, 34, 8, '#82948426');
+      if (this.persona === 'doctor') this.label('已归档', item.x, item.y - 35, this.fontSize(this.mobile ? 26 : 13, 12), '#657d6e');
+      else if (this.persona === 'teacher') this.label('已退回', item.x, item.y - 36, this.fontSize(this.mobile ? 24 : 13, 11), '#778568');
       return;
     }
-    if (!dragging) this.instrument(item.kind, item.x, item.y, this.mobile ? 1.25 : 1);
-    else {
-      const point = this.point(this.gesture.x, this.gesture.y);
-      this.ellipse(item.x, item.y + 12, 42, 10, '#bac8a115', '#bac8a199', 1.5);
-      this.ctx.save(); this.ctx.setLineDash([4, 5]); this.line([[item.x, item.y], [point.x, point.y]], '#bac8a188', 2); this.ctx.restore();
-      this.instrument(item.kind, point.x, point.y, this.mobile ? 1.35 : 1.13, Math.sin(this.time * 6) * 0.045);
+    const dragging = this.gesture?.active && this.dragTarget?.id === item.id;
+    const point = dragging ? this.point(this.gesture.x, this.gesture.y) : item;
+    if (dragging) {
+      this.ctx.save(); this.ctx.setLineDash([4, 5]); this.line([[item.x, item.y], [point.x, point.y]], '#899f7b', 2); this.ctx.restore();
     }
-    const names = this.paintFor('lab').equipmentNames;
-    this.label(names[item.id], item.x, item.y + (this.mobile ? 50 : item.id === 1 ? 44 : 30), this.fontSize(this.mobile ? 26 : 13, 12), '#b8c9c9');
-    const aim = this.point(this.aim.x, this.aim.y);
-    const hovered = this.closest(this.equipment, aim.x, aim.y)?.id === item.id;
-    if (hovered && !this.gesture) this.ellipse(item.x, item.y + 9, 49, 12, null, '#bac8a190', 1.5);
+    if (this.persona === 'phd') this.instrument(item.kind, point.x, point.y, this.mobile ? 1.15 : 1, dragging ? -0.08 : 0);
+    else this.document(this.paintFor('lab').equipmentNames[item.id], point.x, point.y - 43, this.mobile ? 1.17 : 1, item.id, dragging ? -0.08 : 0, this.persona === 'teacher');
+    if (this.persona === 'phd') this.label(this.paintFor('lab').equipmentNames[item.id], item.x, item.y + (this.mobile ? 50 : item.id === 1 ? 44 : 30), this.fontSize(this.mobile ? 26 : 13, 12), '#48675f');
+  }
+
+  document(text, x, y, scale = 1, id = 0, rotation = 0, burden = false) {
+    const c = this.ctx; c.save(); c.translate(x, y); c.rotate(rotation); c.scale(scale, scale);
+    this.rect(-62, -45, 124, 100, 7, '#cbd1bd50', null);
+    this.rect(-64, -50, 124, 100, 6, burden ? '#eee4d3' : '#f7f5e9', '#97a997', 1.5);
+    this.rect(-64, -50, 124, 24, 6, [C.lime, C.blue, C.purple][id % 3], null);
+    this.wrappedLabel(text, -2, 0, 107, this.fontSize(this.mobile ? 20 : 15, 11), '#435f55', 2, true);
+    for (let i = 0; i < 2; i++) this.line([[-46, 20 + i * 11], [40, 20 + i * 11]], '#b1bda6', 1.3);
+    this.path([[40, 50], [60, 30], [40, 30]], '#d8ddc8', '#97a997', 1);
+    c.restore();
   }
 
   instrument(kind, x, y, scale = 1, rotation = 0) {
     const c = this.ctx; c.save(); c.translate(x, y); c.rotate(rotation); c.scale(scale, scale);
     this.ellipse(0, 10, 45, 11, '#060d1360');
-    if (kind === 'microscope') {
+    if (kind === 'document' || kind === 'burden-paper') {
+      this.document(kind === 'burden-paper' ? '额外任务' : '行政材料', 0, -47, 1, 0, 0, kind === 'burden-paper');
+    } else if (kind === 'microscope') {
       this.rect(-33, -1, 65, 14, 7, '#b8d1c7', C.ink, 2.5);
       c.beginPath(); c.moveTo(1, 0); c.bezierCurveTo(36, -28, 22, -79, 2, -84); c.lineTo(-6, -66); c.bezierCurveTo(10, -50, 12, -25, -9, 0); c.closePath(); c.fillStyle = '#8eb3b0'; c.fill(); c.strokeStyle = C.ink; c.lineWidth = 3; c.stroke();
       c.save(); c.translate(-12, -78); c.rotate(-0.36); this.rect(-11, -20, 22, 52, 5, '#e4edda', C.ink, 2.5); this.rect(-12, -24, 24, 10, 3, C.purple, C.ink, 2); this.rect(-6, 30, 12, 12, 2, '#547983', C.ink, 2); c.restore();
@@ -717,35 +943,29 @@ export class Universe {
 
   mentor() {
     const c = this.ctx, core = this.core;
-    this.glow(core.x, core.y, 205, '#b3a9c61f');
-    const shut = this.ended ? 0.55 : 1;
-    c.save(); c.translate(core.x, core.y); c.rotate(this.reducedMotion ? -0.18 : this.time * 0.12 - 0.18); c.scale(shut, shut);
-    this.ellipse(0, 0, 113, 49, null, '#b3a9c610', 24);
-    this.ellipse(0, 0, 110, 45, null, '#b3a9c685', 5);
-    this.ellipse(0, 0, 90, 39, null, '#d9c5a1a5', 2);
-    this.ellipse(0, 0, core.r, core.r, '#23333e', '#9c8eaf', 2);
-    this.ellipse(0, 0, core.r - 8, core.r - 8, '#293841', '#b3a9c621', 8);
-    c.restore();
-    this.label(this.ended ? '休息一会儿' : '消息放这里', core.x, core.y + 7, this.mobile ? 19 : 14, this.ended ? C.lime : '#ede5f1');
+    if (this.persona === 'teacher') this.teacherCharacter();
+    else {
+    this.rect(core.x - 87, core.y - 63, 174, 126, 19, '#d2dfcd', '#8da389', 2);
+    this.rect(core.x - 68, core.y - 51, 136, 13, 5, '#92aa8c', '#718c70', 1);
+    this.label(this.ended ? '消息已收好' : '消息收纳盒', core.x, core.y + 7, this.fontSize(this.mobile ? 27 : 18, 13), '#41644d');
+    this.label('明天再处理', core.x, core.y + 36, this.fontSize(this.mobile ? 21 : 12, 11), '#5f7c61');
+    }
+    if (this.persona === 'phd') { this.humanAvatar(core.x - 134, core.y - 65, this.paintFor('mentor').mentorAvatarLabel || '导师', 0.8); this.humanAvatar(core.x + 134, core.y - 65, this.paintFor('mentor').researcherLabel || '博士生', 0.8); }
     this.cards.forEach(card => {
       if (card.gone) return;
       if (this.gesture?.active && this.dragTarget?.id === card.id) {
         const point = this.point(this.gesture.x, this.gesture.y);
-        c.save(); c.setLineDash([4, 6]); this.line([[point.x, point.y], [core.x, core.y]], '#b3a9c67a', 2); c.restore();
+        c.save(); c.setLineDash([4, 6]); this.line([[point.x, point.y], [core.x, core.y]], '#9baa99', 2); c.restore();
         this.chat(card.text, point.x, point.y, card.id, true);
       } else this.chat(card.text, card.x, card.y + (this.reducedMotion ? 0 : Math.sin(this.time * 1.5 + card.id) * 3), card.id);
     });
     this.replies.forEach(reply => {
-      const slot = this.ended || this.bursting ? { x: 400, y: core.y + (this.mobile ? 150 : 138) } : this.cards[reply.id];
-      const w = this.ended || this.bursting ? (this.mobile ? 680 : 410) : (this.mobile ? 340 : 222);
-      const hh = this.mobile ? 78 : 54;
-      this.rect(slot.x - w / 2, slot.y - hh / 2, w, hh, 16, '#45605a', '#bac8a166', 1.5);
-      this.wrappedLabel(reply.text, slot.x, slot.y + 8, w - 24, this.fontSize(this.mobile ? 28 : 14, 13), '#ebefe1', 2, true);
+      const slot = this.ended || this.bursting ? { x: 400, y: core.y + (this.mobile ? 150 : 135) } : this.cards[reply.id];
+      const w = this.ended || this.bursting ? (this.mobile ? 670 : 410) : (this.mobile ? 330 : 215);
+      const hh = this.mobile ? 77 : 54;
+      this.rect(slot.x - w / 2, slot.y - hh / 2, w, hh, 16, '#d1dfc7', '#95ac8c', 1.5);
+      this.wrappedLabel(reply.text, slot.x, slot.y + 8, w - 24, this.fontSize(this.mobile ? 27 : 14, 13), '#3d5e45', 2, true);
     });
-    if (this.ended) {
-      this.paperPlane(core.x - 128, core.y - 125, 1, -0.22, C.lime);
-      this.paperPlane(core.x + 136, core.y - 88, 0.8, 0.3, C.blue);
-    }
   }
 
   chat(text, x, y, id, dragging = false, scale = 1) {
@@ -762,89 +982,34 @@ export class Universe {
   }
 
   earth() {
-    const c = this.ctx, g = this.globe;
-    this.glow(g.x, g.y, g.r * 1.8, '#5cabd525');
-    this.orbits();
-    if (this.bursting || this.ended) {
-      const p = this.ended || this.reducedMotion ? 1 : clamp(this.burstAge / this.burstDuration);
-      if (p > 0.4) {
-        const growth = this.reducedMotion ? 1 : clamp((p - 0.4) / 0.6);
-        c.save(); c.globalAlpha = growth;
-        this.ellipse(g.x, g.y + 54, 89 + growth * 33, 29, null, '#a7c3cd5a', 2);
-        this.ellipse(g.x, g.y + 56, 72, 20, '#192d30', '#45666d', 2);
-        this.line([[g.x, g.y + 55], [g.x, g.y - 15 * growth]], C.lime, 6);
-        this.ellipse(g.x - 17, g.y + 18, 22, 9, C.lime, null, 1, 0.45);
-        this.ellipse(g.x + 17, g.y + 7, 22, 9, '#aebf98', null, 1, -0.45);
-        for (let i = 0; i < 6; i++) this.ellipse(g.x + Math.cos(i * TAU / 6) * 17, g.y - 29 + Math.sin(i * TAU / 6) * 17, 13, 15, C.purple, '#cfc0f7', 1);
-        this.ellipse(g.x, g.y - 29, 11, 11, C.gold, C.ink, 1.5);
-        this.label(this.persona === 'doctor' ? '这一刻，留给自己' : this.persona === 'teacher' ? '下课后，还有花开' : '歇一会儿，再出发', g.x, g.y + 112, this.mobile ? 25 : 17, C.white);
-        c.restore();
-      }
-    } else {
-      this.worldSurface(g.x, g.y, g.r);
-      c.save(); c.translate(g.x, g.y); c.beginPath(); c.arc(0, 0, g.r, 0, TAU); c.clip();
+    const g = this.globe;
+    if (this.persona === 'teacher') { this.teacherTarget(); return; }
+    if (this.persona === 'doctor') {
+      this.platform(400, g.y + g.r * 0.68, 588, this.mobile ? 132 : 72);
+      if (!this.bursting && !this.ended) {
+        for (let i = 0; i < 7; i++) this.document(['DRG说明', '编码复核', '费用反馈', '绩效报表', 'DRG清单', '复核材料', '补充说明'][i], g.x + (i % 3 - 1) * (this.mobile ? 106 : 72), g.y + Math.floor(i / 3) * 26 - 60, this.mobile ? 1.4 : 1.2, i, (i % 2 ? 1 : -1) * 0.09);
+        this.label('DRG 纸堆', g.x, g.y + g.r + 47, this.fontSize(this.mobile ? 33 : 21, 14), '#4d7164');
+        this.cracks.forEach((crack, i) => this.line([[g.x + crack.x * g.r - 38, g.y + crack.y * g.r], [g.x + crack.x * g.r, g.y + crack.y * g.r + 14], [g.x + crack.x * g.r + 37, g.y + crack.y * g.r - 14]], '#b7a27e', 2 + i % 2));
+      } else this.label('纸张飞走了，呼吸回来了。', g.x, g.y + 72, this.fontSize(this.mobile ? 29 : 20, 13), '#3e6857');
+      return;
+    }
+    this.platform(400, g.y + g.r + 24, this.mobile ? 680 : 516, this.mobile ? 90 : 55);
+    if (!this.bursting && !this.ended) {
+      this.globeSurface(g.x, g.y, g.r);
+      this.label('DDL', g.x, g.y + 15, this.fontSize(this.mobile ? 54 : 34, 21), '#314d48');
       this.cracks.forEach((crack, i) => {
-        const x = crack.x * g.r, y = crack.y * g.r, length = (35 + crack.power * 12) * g.r / 142;
-        c.save(); c.translate(x, y); c.rotate(crack.angle + i * 0.6);
-        this.glow(0, 0, length * 0.7, '#d9c5a135');
-        this.line([[-length * 0.7, -10], [-length * 0.28, 4], [0, 0], [length * 0.23, 16], [length * 0.66, 7], [length, 30]], '#e2c7a3', 2.4);
-        this.line([[0, 0], [6, -length * 0.3], [24, -length * 0.57]], '#ecdcc1', 1.3);
-        this.ellipse(0, 0, 8 + crack.power * 2, 6, '#243c49', '#c5aa84', 1); c.restore();
-      }); c.restore();
+        const x = g.x + crack.x * g.r, y = g.y + crack.y * g.r;
+        this.line([[x - 36, y - 9], [x - 12, y + 5], [x, y], [x + 19, y + 16], [x + 49, y + 6]], '#e5c7a0', 2.5);
+        this.line([[x, y], [x + 8, y - 29], [x + 29, y - 43]], '#ead8b7', 1.5);
+      });
+      this.paintFor('earth').satellites.forEach((text, i) => { const x = 213 + i * 186; this.rect(x - 63, this.H - 99, 126, 37, 7, '#e2ddce', '#a8b5a1', 1); this.label(text, x, this.H - 75, this.fontSize(this.mobile ? 26 : 14, 12), '#566f61'); });
+    } else {
+      this.flowerPot(g.x, g.y + 70, this.mobile ? 2.0 : 1.1);
+      this.label('实验室里，给自己留点空。', g.x, g.y + 151, this.fontSize(this.mobile ? 28 : 18, 13), '#406351');
     }
   }
 
-  worldSurface(x, y, r) {
-    if (this.persona === 'doctor') this.clockSurface(x, y, r);
-    else if (this.persona === 'teacher') this.gridSurface(x, y, r);
-    else this.globeSurface(x, y, r);
-  }
-
-  clockSurface(x, y, r) {
-    const c = this.ctx; c.save(); c.translate(x, y);
-    this.ellipse(0, 0, r + 10, r + 10, null, '#d9c5a122', 13);
-    const casing = c.createLinearGradient(-r, -r, r, r); casing.addColorStop(0, '#ccd5d1'); casing.addColorStop(1, '#7f98a1');
-    this.ellipse(0, 0, r, r, casing, '#d3dbd7', 2);
-    const face = c.createLinearGradient(-r, -r, r, r); face.addColorStop(0, '#f4eee2'); face.addColorStop(1, '#d4d7cf');
-    this.ellipse(0, 0, r * 0.88, r * 0.88, face, '#708991', 2);
-    for (let i = 0; i < 60; i++) {
-      const a = i * TAU / 60, inner = i % 5 === 0 ? 0.73 : 0.79;
-      this.line([[Math.sin(a) * r * inner, -Math.cos(a) * r * inner], [Math.sin(a) * r * 0.82, -Math.cos(a) * r * 0.82]], '#829699', i % 5 ? 1 : 2.5);
-    }
-    ['12', '3', '6', '9'].forEach((text, i) => { const a = i * TAU / 4; this.label(text, Math.sin(a) * r * 0.61, -Math.cos(a) * r * 0.61 + r * 0.05, r * 0.12, '#607780'); });
-    this.rect(-r * 0.36, r * 0.20, r * 0.72, r * 0.16, 3, '#c3cdc4', '#9bab9f', 1);
-    this.label('休息也在日程里', 0, r * 0.31, r * 0.075, '#65796e');
-    this.line([[0, 0], [-r * 0.30, -r * 0.30]], '#627d89', r * 0.055);
-    this.line([[0, 0], [r * 0.36, -r * 0.56]], '#ac8b93', r * 0.035);
-    this.line([[0, r * 0.13], [0, -r * 0.67]], '#bea77f', r * 0.012);
-    this.ellipse(0, 0, r * 0.065, r * 0.065, '#8da6ab', '#607a84', 2);
-    this.ellipse(-r * 0.2, -r * 0.27, r * 0.54, r * 0.12, null, '#ffffff25', 6, -0.45);
-    c.restore();
-  }
-
-  gridSurface(x, y, r) {
-    const c = this.ctx; c.save(); c.translate(x, y);
-    this.ellipse(0, 0, r + 10, r + 10, null, '#b3a9c627', 13);
-    const paper = c.createLinearGradient(-r, -r, r, r); paper.addColorStop(0, '#f3ede1'); paper.addColorStop(0.48, '#d7ded4'); paper.addColorStop(1, '#90a7ac');
-    this.ellipse(0, 0, r, r, paper, '#dce4d8', 2);
-    c.save(); c.beginPath(); c.arc(0, 0, r - 2, 0, TAU); c.clip();
-    this.rect(-r, -r * 0.71, r * 2, r * 0.29, 0, '#b4bcc4', null);
-    this.label('本周待办', 0, -r * 0.53, r * 0.115, '#526d79');
-    for (let i = -3; i <= 3; i++) {
-      const xx = i * r * 0.24;
-      this.line([[xx, -r * 0.43], [xx, r]], '#829c9d80', 1.3);
-      this.line([[-r, i * r * 0.24 + r * 0.06], [r, i * r * 0.24 + r * 0.06]], '#829c9d80', 1.3);
-    }
-    for (let i = 0; i < 9; i++) {
-      const xx = (i % 3 - 1) * r * 0.47, yy = Math.floor(i / 3) * r * 0.24 - r * 0.22;
-      this.rect(xx - r * 0.16, yy, r * 0.30, r * 0.12, 2, [C.purple, C.lime, C.gold][i % 3], null);
-      this.line([[xx - r * 0.11, yy + r * 0.05], [xx + r * 0.07, yy + r * 0.05]], '#6e8180', 1);
-    }
-    c.restore();
-    this.path([[r * 0.51, -r * 0.78], [r * 0.91, -r * 0.39], [r * 0.50, -r * 0.42]], '#e9e5d8', '#a6b8b5', 1.5);
-    this.ellipse(-r * 0.28, -r * 0.21, r * 0.6, r * 0.15, null, '#ffffff25', 5, -0.44);
-    c.restore();
-  }
+  worldSurface(x, y, r) { this.globeSurface(x, y, r); }
 
   globeSurface(x, y, r) {
     const c = this.ctx; c.save(); c.translate(x, y);
@@ -866,79 +1031,118 @@ export class Universe {
     this.ellipse(0, 0, 100, 100, shade); c.restore(); c.restore();
   }
 
-  orbits() {
-    if (this.ended) return;
-    const c = this.ctx, g = this.globe, rx = this.mobile ? 308 : 278, ry = this.mobile ? 252 : 155;
-    c.save(); c.setLineDash([3, 6]); this.ellipse(g.x, g.y, rx, ry, null, '#a7c3cd3a', 1, -0.16); c.restore();
-    this.paintFor('earth').satellites.forEach((text, i) => {
-      const a = i * TAU / 3 + (this.reducedMotion ? 0.4 : this.time * 0.11 + 0.4);
-      const escape = this.bursting ? this.burstAge * 230 : 0;
-      const x = g.x + Math.cos(a) * (rx + escape), y = g.y + Math.sin(a) * (ry + escape);
-      c.save(); c.translate(x, y); c.rotate(-0.16);
-      this.rect(-19, -11, 38, 22, 5, '#a6b7c8', C.ink, 1.5);
-      this.rect(-45, -12, 22, 24, 2, '#426892', '#88b4d2', 1); this.rect(23, -12, 22, 24, 2, '#426892', '#88b4d2', 1);
-      for (let j = 0; j < 2; j++) { this.line([[-42, -5 + j * 9], [-26, -5 + j * 9]], '#a1cdeb70', 1); this.line([[26, -5 + j * 9], [42, -5 + j * 9]], '#a1cdeb70', 1); }
-      this.label(text, 0, 4, 10, '#213641'); c.restore();
+
+  mice() {
+    if (this.persona === 'teacher') { this.teacherTarget(); return; }
+    if (this.persona === 'doctor') { this.documentConveyor(); return; }
+    const stageY = this.mobile ? this.H * 0.62 : 322;
+    this.platform(400, stageY, 725, this.mobile ? this.H * 0.47 : 163);
+    this.speaker(this.mobile ? 82 : 104, stageY - 13, this.mobile ? 1.1 : 0.8);
+    this.speaker(this.mobile ? 719 : 700, stageY - 13, this.mobile ? 1.1 : 0.8);
+    this.mouseSpots().forEach(mouse => this.interactiveMouse(mouse.x, mouse.y, this.mobile ? 1.6 : 1.05, ['dj', 'party', 'vacation', 'scientist'][mouse.id], mouse.id));
+    this.researcherPerson(400, this.H - 67, this.mobile ? 1.35 : 0.73);
+    this.label('博士生也来歇一会儿', 400, this.H - 40, this.fontSize(this.mobile ? 23 : 12, 11), '#566e60');
+    this.discoBall(400, this.mobile ? 104 : 65);
+    if (this.bursting || this.ended) this.label(this.paintFor('mice').partyLabel, 400, this.mobile ? this.H * 0.78 : 414, this.fontSize(this.mobile ? 30 : 19, 13), '#4f705c');
+  }
+
+  documentConveyor() {
+    const h = this.H, y = this.mobile ? h * 0.55 : h * 0.60;
+    this.rect(83, this.mobile ? h * 0.17 : y - 114, 629, this.mobile ? h * 0.65 : 172, 26, '#c1d2ca', '#91a99e', 2);
+    this.rect(97, this.mobile ? h * 0.18 : y - 98, 601, this.mobile ? h * 0.62 : 140, 18, '#dfe4d5', '#a7b6a5', 1.5);
+    const movement = this.reducedMotion ? 0 : this.time * 42 % 50;
+    for (let i = 0; i < 13; i++) {
+      if (this.mobile) this.line([[113, h * 0.18 + i * 52 + movement], [681, h * 0.18 + i * 52 + movement]], '#bdc7b2', 3);
+      else this.line([[113 + i * 49 + movement, y - 92], [113 + i * 49 + movement, y + 34]], '#bdc7b2', 3);
+    }
+    this.layoutQueue();
+    this.queue.filter(item => !item.gone && Number.isFinite(item.x)).slice(0, 3).forEach(item => this.document(item.text, item.x, item.y, this.mobile ? 1.45 : 1.12, item.id, -0.025));
+    this.rect(584, this.mobile ? h - 165 : y + 51, 149, 63, 9, '#b5c8b4', '#839f83', 2);
+    this.label('行政任务收纳', 659, this.mobile ? h - 127 : y + 89, this.fontSize(this.mobile ? 23 : 13, 11), '#3f6045');
+    const left = this.queue.filter(item => !item.gone).length;
+    this.label(left ? `还剩 ${left} 件，慢慢清。` : '队列空了，先去喝杯水。', 400, this.mobile ? h - 65 : y + 142, this.fontSize(this.mobile ? 29 : 19, 13), '#456d5b');
+  }
+
+  teacherCharacter() {
+    const c = this.ctx, a = this.character;
+    this.ellipse(a.x + a.width / 2, a.y + a.height - 8, a.width * 0.46, 17, '#7d856326');
+    if (this.teacherAssetStatus === 'ready') {
+      c.save();
+      const wobble = this.reducedMotion ? 0 : Math.sin(this.time * 35) * this.faceReaction * 0.035;
+      c.translate(a.faceX, a.y + a.height * 0.68); c.rotate(wobble);
+      c.drawImage(this.teacherImage, a.x - a.faceX, -a.height * 0.68, a.width, a.height);
+      c.restore();
+    } else {
+      this.rect(a.x, a.y, a.width, a.height, 12, '#e1dfd1', '#b2b6a1', 1.5);
+      this.wrappedLabel(this.teacherAssetStatus === 'error' ? '人物画面加载失败，请刷新。' : '人物画面正在加载…', a.x + a.width / 2, a.y + a.height / 2, a.width - 20, this.fontSize(17, 13), '#526550', 3, true);
+    }
+    this.stickers.forEach((sticker, i) => {
+      c.save(); c.translate(sticker.x, sticker.y); c.rotate(sticker.tilt + (this.reducedMotion ? 0 : Math.sin(this.time * 9 + i) * this.faceReaction * 0.07));
+      this.rect(-46, -10, 92, 30, 3, '#eee0b5', '#b9aa83', 1);
+      this.label(sticker.text, 0, 11, this.fontSize(11, 9), '#5f6347'); c.restore();
     });
   }
 
-  mice() {
-    const c = this.ctx, h = this.H;
-    const stageY = this.mobile ? h * 0.73 : h * 0.74;
-    this.platform(400, stageY, 724, this.mobile ? 260 : 108);
-    c.save(); c.globalAlpha = this.reducedMotion ? 0.14 : 0.16 + Math.sin(this.time * 3) * 0.025;
-    [[128, C.purple, 343], [665, C.pink, 445], [400, C.lime, 605]].forEach(([x, color, end]) => this.path([[x, 78], [end - 92, stageY + 38], [end + 92, stageY + 38]], color, null)); c.restore();
-    if (this.persona === 'phd') {
-      this.speaker(this.mobile ? 89 : 108, stageY - 35, this.mobile ? 1.13 : 1);
-      this.speaker(this.mobile ? 711 : 692, stageY - 35, this.mobile ? 1.13 : 1);
-    } else {
-      this.flowerPot(this.mobile ? 94 : 108, stageY - 29, this.persona === 'teacher' ? 1.35 : 1.1);
-      this.flowerPot(this.mobile ? 706 : 692, stageY - 29, this.persona === 'teacher' ? 1.35 : 1.1);
-      if (this.persona === 'teacher') {
-        c.save(); c.globalAlpha = 0.25; this.ellipse(400, stageY + 28, 324, 61, '#aabd9b'); c.restore();
-        this.instrument('pencils', 132, this.mobile ? h * 0.35 : 205, 0.75, -0.12);
-        this.instrument('books', 670, this.mobile ? h * 0.35 : 205, 0.63, 0.14);
-      }
+  teacherTarget() {
+    const a = this.character, labels = this.paintFor().burdens;
+    this.teacherCharacter();
+    const next = labels[this.hits % labels.length];
+    this.rect(this.mobile ? 62 : 57, this.mobile ? this.H - 184 : 295, this.mobile ? 230 : 193, this.mobile ? 103 : 93, 12, '#f0dfbf', '#b6a17b', 1.5);
+    this.label('这次送回', this.mobile ? 177 : 154, this.mobile ? this.H - 151 : 324, this.fontSize(this.mobile ? 25 : 15, 12), '#7b7054');
+    this.wrappedLabel(next, this.mobile ? 177 : 154, this.mobile ? this.H - 111 : 354, this.mobile ? 204 : 172, this.fontSize(this.mobile ? 28 : 19, 13), '#5c664d', 2, true);
+    this.paperBall(this.mobile ? 167 : 157, this.mobile ? this.H - 232 : 260, this.mobile ? 25 : 19);
+    if (!this.ended) {
+      this.ctx.save(); this.ctx.setLineDash([5, 8]); this.ellipse(a.faceX, a.faceY, a.faceRadius, a.faceRadius * 0.84, null, '#a8906b80', 1.5); this.ctx.restore();
+
     }
-    const djY = this.mobile ? h * 0.44 : 201;
-    this.mouse(400, djY, this.mobile ? 1.56 : 1.05, this.persona === 'phd' ? 'dj' : this.persona, 0);
-    this.path([[312, djY + 37], [466, djY + 31], [490, djY + 58], [333, djY + 65]], '#8b8b9d', '#b3a9c6', 2);
-    if (this.persona === 'phd') {
-      this.ellipse(357, djY + 49, 28, 9, '#354551', C.purple, 2); this.ellipse(435, djY + 45, 28, 9, '#354551', C.purple, 2);
-      this.ellipse(357, djY + 49, 7, 3, C.pink); this.ellipse(435, djY + 45, 7, 3, C.lime);
-    } else if (this.persona === 'doctor') {
-      this.instrument('cup', 356, djY + 47, 0.47);
-      this.ellipse(437, djY + 45, 28, 10, '#dfdacd', '#9dafa9', 1);
-      this.ellipse(434, djY + 42, 11, 7, C.gold, '#9d8c71', 1);
-      this.ellipse(450, djY + 43, 9, 6, '#c6afa0', '#9d8c71', 1);
-    } else {
-      this.instrument('books', 362, djY + 48, 0.42);
-      this.instrument('cup', 446, djY + 46, 0.39);
-    }
-    const colors = [C.pink, C.blue, C.lime, C.purple];
-    for (let i = 0; i < 16; i++) {
-      const x = 173 + i % 8 * 66, y = stageY + Math.floor(i / 8) * 25;
-      const alpha = this.reducedMotion ? '50' : Math.sin(this.time * 4 + i) > 0 ? '75' : '28';
-      this.path([[x, y], [x + 47, y - 2], [x + 64, y + 15], [x + 15, y + 18]], `${colors[i % 4]}${alpha}`, null);
-    }
-    const spots = this.mobile ? [[205, h * 0.59], [595, h * 0.60], [315, h * 0.74], [495, h * 0.74], [185, h * 0.82], [615, h * 0.82], [310, h * 0.86], [490, h * 0.86], [400, h * 0.62]] : [[220, 306], [578, 292], [326, 326], [467, 317], [159, 255], [644, 250], [283, 239], [519, 239], [400, 355]];
-    spots.slice(0, this.guests - 1).forEach(([x, y], i) => this.mouse(x, Math.min(y, h - 120), this.mobile ? 1.30 : 0.75, ['party', 'vacation', this.persona === 'phd' ? 'scientist' : this.persona][i % 3], i + 1));
-    if (this.ended || this.bursting) {
-      const yy = this.mobile ? h - 174 : h - 96;
-      this.rect(265, yy - 3, 270, 48, 14, '#9d90ae', '#d2c7dc', 2);
-      this.ellipse(309, yy + 44, 15, 15, '#20303a', '#9fb7c4', 3); this.ellipse(493, yy + 44, 15, 15, '#20303a', '#9fb7c4', 3);
-      this.label(this.paintFor('mice').partyLabel, 400, yy + 26, this.mobile ? 23 : 18, C.white);
-      this.line([[531, yy + 6], [558, yy - 61]], C.lime, 2);
-      this.path([[553, yy - 61], [641, yy - 57], [620, yy - 29], [541, yy - 35]], C.lime, '#53664e', 1.5); this.label('歇一会儿', 592, yy - 41, 14, '#3e5041');
-    }
-    if (this.persona === 'phd') this.discoBall(400, this.mobile ? 97 : 65);
-    else if (this.persona === 'teacher') this.instrument('bell', 400, this.mobile ? 145 : 108, 0.59);
-    else {
-      this.line([[321, 0], [321, 65]], '#b5bab5', 1.5); this.line([[479, 0], [479, 65]], '#b5bab5', 1.5);
-      this.path([[300, 66], [342, 66], [356, 94], [286, 94]], C.gold, '#b9b59e', 1.5);
-      this.path([[458, 66], [500, 66], [514, 94], [444, 94]], C.gold, '#b9b59e', 1.5);
-      this.glow(321, 94, 65, '#d9c5a126'); this.glow(479, 94, 65, '#d9c5a126');
-    }
+  }
+
+  paperBall(x, y, radius = 19, rotation = 0, text = '') {
+    const c = this.ctx; c.save(); c.translate(x, y); c.rotate(rotation);
+    this.path([[-radius, -radius * 0.21], [-radius * 0.65, -radius * 0.85], [radius * 0.15, -radius], [radius * 0.83, -radius * 0.57], [radius, radius * 0.36], [radius * 0.31, radius], [-radius * 0.73, radius * 0.76]], '#f7ecd4', '#a49c7f', 1.6);
+    this.line([[-radius * 0.65, -radius * 0.65], [0, -radius * 0.11], [radius * 0.31, -radius * 0.77]], '#c6b99b', 1.2);
+    this.line([[-radius * 0.86, radius * 0.13], [-radius * 0.19, radius * 0.41], [radius * 0.65, 0], [radius * 0.8, radius * 0.44]], '#c6b99b', 1.2);
+    if (text) this.label(text, 0, radius + 22, this.fontSize(this.mobile ? 21 : 11, 10), '#6b7154');
+    c.restore();
+  }
+
+  interactiveMouse(x, y, scale, outfit, id) {
+    const reaction = this.mouseReactions.find(item => item.id === id);
+    const bounce = reaction && !this.reducedMotion ? Math.sin(clamp(reaction.age / reaction.life) * Math.PI * 4) * 12 : 0;
+    if (reaction?.tool === 'disco' && !this.reducedMotion) { this.ctx.save(); this.ctx.translate(x, y - 28); this.ctx.rotate(clamp(reaction.age / reaction.life) * TAU); this.mouse(0, 28 - Math.abs(bounce), scale, outfit, id); this.ctx.restore(); }
+    else this.mouse(x, y - Math.abs(bounce), scale, outfit, id);
+    if (reaction) { this.ellipse(x, y - 90 * scale, 24, 15, '#e5dfbd', '#a8ae8f', 1); this.label(reaction.tool === 'snacks' ? '咔嚓' : reaction.tool === 'bubbles' ? '啵' : '♪', x, y - 90 * scale + 5, this.fontSize(this.mobile ? 24 : 14, 11), '#5b6d52'); }
+  }
+
+  researcherPerson(x, y, scale = 1) {
+    const c = this.ctx; c.save(); c.translate(x, y); c.scale(scale, scale);
+    const rest = this.researcherReaction > 0;
+    this.ellipse(0, 1, 39, 8, '#61785c25');
+    this.rect(-21, -47, 17, 42, 5, '#7f9690', C.ink, 1.7); this.rect(5, -47, 17, 42, 5, '#7f9690', C.ink, 1.7);
+    this.rect(-28, -10, 26, 12, 4, '#48665e', C.ink, 1.5); this.rect(4, -10, 29, 12, 4, '#48665e', C.ink, 1.5);
+    this.path([[-29, -111], [-34, -53], [-5, -41], [0, -75], [6, -41], [34, -52], [27, -111], [8, -123], [-9, -123]], '#f0f1e5', '#728d81', 2);
+    this.path([[-9, -123], [0, -101], [-14, -87], [-21, -111]], '#d0e0d0', '#728d81', 1);
+    this.path([[9, -123], [0, -101], [14, -87], [21, -111]], '#d0e0d0', '#728d81', 1);
+    this.rect(13, -72, 13, 12, 2, '#bed2bb', '#8fa78c', 1);
+    this.line([[-29, -104], [-47, rest ? -93 : -59]], '#819d8c', 10); this.line([[29, -103], [rest ? 49 : 46, rest ? -103 : -63]], '#819d8c', 10);
+    this.ellipse(-47, rest ? -91 : -54, 7, 7, '#d6b591', '#8f927a', 1); this.ellipse(rest ? 49 : 46, rest ? -105 : -58, 7, 7, '#d6b591', '#8f927a', 1);
+    this.ellipse(0, -142, 27, 31, '#e2c29d', '#788a71', 2);
+    this.path([[-27, -143], [-24, -167], [-7, -178], [13, -174], [27, -157], [22, -142], [17, -158], [-10, -160], [-19, -139]], '#506757', '#455e4a', 1.5);
+    this.rect(-23, -149, 20, 15, 5, '#d8e6d633', '#607a68', 1.5); this.rect(3, -149, 20, 15, 5, '#d8e6d633', '#607a68', 1.5); this.line([[-3, -141], [3, -141]], '#607a68', 1.5);
+    if (rest) { this.line([[-17, -141], [-12, -138], [-7, -141]], '#516650', 1.3); this.line([[7, -141], [12, -138], [17, -141]], '#516650', 1.3); }
+    else { this.ellipse(-12, -141, 2, 2.5, '#486149'); this.ellipse(12, -141, 2, 2.5, '#486149'); }
+    this.line([[-7, -124], [0, -120], [7, -124]], '#9b8569', 1.3);
+    if (rest) this.document('休息一下', 66, -119, 0.37, 0);
+    c.restore();
+  }
+
+  humanAvatar(x, y, label, scale = 1) {
+    const c = this.ctx; c.save(); c.translate(x, y); c.scale(scale, scale);
+    this.ellipse(0, 0, 31, 31, '#d4deca', '#8ea17e', 1.5);
+    this.ellipse(0, -3, 17, 20, '#ddbc97', '#839174', 1.2);
+    this.path([[-17, -5], [-14, -22], [4, -27], [17, -17], [14, -4], [8, -17], [-10, -15]], '#596b50', null);
+    this.rect(-13, -7, 11, 9, 3, null, '#647b5d', 1); this.rect(2, -7, 11, 9, 3, null, '#647b5d', 1); this.line([[-2, -3], [2, -3]], '#647b5d', 1);
+    this.label(label, 0, 48, this.fontSize(13, 11), '#486549'); c.restore();
   }
 
   flowerPot(x, y, scale = 1) {
@@ -1004,18 +1208,6 @@ export class Universe {
     c.restore();
   }
 
-  rocket(x, y, scale, mouse = false) {
-    const c = this.ctx; c.save(); c.translate(x, y); c.scale(scale, scale);
-    this.glow(0, 42, 65, '#b3a9c622');
-    this.path([[-24, 14], [-43, 43], [-26, 49], [-15, 29]], C.purple, C.ink, 2);
-    this.path([[24, 14], [43, 43], [26, 49], [15, 29]], C.purple, C.ink, 2);
-    c.beginPath(); c.moveTo(-23, 36); c.bezierCurveTo(-35, -5, -20, -48, 0, -61); c.bezierCurveTo(20, -48, 35, -5, 23, 36); c.closePath(); c.fillStyle = '#dce8dc'; c.fill(); c.strokeStyle = C.ink; c.lineWidth = 2.5; c.stroke();
-    this.ellipse(0, -9, 19, 20, '#6e9db4', '#384f60', 3);
-    if (mouse) { this.ellipse(-9, -17, 6, 7, '#d6ddd2'); this.ellipse(9, -17, 6, 7, '#d6ddd2'); this.ellipse(0, -8, 12, 11, '#edf2df'); this.line([[-7, -10], [-4, -12], [-1, -10]], C.ink, 1); this.line([[1, -10], [4, -12], [7, -10]], C.ink, 1); this.ellipse(0, -3, 2, 1.5, C.pink); }
-    const flicker = this.reducedMotion ? 0 : Math.sin(this.time * 15) * 8;
-    this.path([[-14, 41], [0, 81 + flicker], [14, 41]], C.lime, null); this.path([[-6, 41], [0, 65 + flicker * 0.5], [6, 41]], C.white, null);
-    c.restore();
-  }
 
   paperPlane(x, y, scale = 1, rotation = 0, color = C.white) {
     const c = this.ctx; c.save(); c.translate(x, y); c.rotate(rotation); c.scale(scale, scale);
@@ -1096,7 +1288,24 @@ export class Universe {
   drawFlights() {
     const c = this.ctx;
     this.flights.forEach(flight => {
-      const p = clamp(flight.age / flight.life);
+      const delayedAge = flight.age - (flight.delay || 0);
+      if (delayedAge < 0) return;
+      const p = clamp(delayedAge / flight.life);
+      if (flight.kind === 'burden') {
+        const contact = 0.46, forward = clamp(p / contact);
+        const x = p < contact ? flight.originX + (flight.toX - flight.originX) * forward : flight.toX + (p - contact) * (flight.originX < 400 ? 190 : -190);
+        const y = p < contact ? flight.originY + (flight.toY - flight.originY) * forward - Math.sin(forward * Math.PI) * 65 : flight.toY + (p - contact) * 280;
+        c.save(); c.globalAlpha = p < contact ? 1 : clamp((1 - p) * 2);
+        const fx = this.reducedMotion ? flight.toX : x, fy = this.reducedMotion ? flight.toY : y;
+        if (flight.shape === 'plane') { this.paperPlane(fx, fy, this.mobile ? 1.0 : 0.7, this.reducedMotion ? -0.3 : -0.3 + p * 0.5, '#f2e6cf'); if (p < contact) this.label(flight.text, fx, fy + 35, this.fontSize(this.mobile ? 22 : 11, 10), '#6b7154'); }
+        else if (flight.shape === 'bundle') { this.paperBall(fx - 9, fy + 3, this.mobile ? 25 : 18, p * 6); this.paperBall(fx + 13, fy - 8, this.mobile ? 25 : 18, -p * 4, p < contact ? flight.text : ''); }
+        else this.paperBall(fx, fy, this.mobile ? 24 : 16, this.reducedMotion ? 0.12 : p * 7, p < contact ? flight.text : '');
+        c.restore(); return;
+      }
+      if (flight.kind === 'sorted' || flight.kind === 'queued') {
+        const x = flight.originX + (flight.toX - flight.originX) * p, y = flight.originY + (flight.toY - flight.originY) * p - Math.sin(p * Math.PI) * 45;
+        c.save(); c.globalAlpha = 1 - p * 0.85; if (flight.tool === 'gravity' || flight.tool === 'bubbles') { this.rect(x - 35 * (1 - p), y - 14, 70 * (1 - p) + 6, 28, 12, '#edf0dd', '#91a48b', 1.5); this.ellipse(x + 32 * (1 - p), y, 8, 14, '#d3dbc3', '#91a48b', 1); } else this.document(flight.item.text || this.paintFor('lab').equipmentNames[flight.item.id], x, y, (1 - p * 0.6) * (this.mobile ? 1.2 : 1), flight.item.id, p * 0.4); c.restore(); return;
+      }
       if (this.reducedMotion) return;
       if (flight.kind === 'equipment') {
         const shrink = flight.sink ? 1 - p : 1;
@@ -1126,7 +1335,14 @@ export class Universe {
     this.effects.forEach(effect => {
       const p = clamp(effect.age / effect.life), x = effect.x, y = effect.y;
       c.save(); c.globalAlpha = this.reducedMotion ? 0.65 : Math.min(1, (1 - p) * 3);
-      if (effect.kind === 'hammer') {
+      if (effect.kind === 'sort-wrong') {
+        this.label(effect.text, x, y - p * 16, this.fontSize(this.mobile ? 25 : 16, 12), '#906f58');
+      } else if (effect.kind === 'researcher-rest') {
+        this.label('喝口水，放松肩膀。', x, y - p * 16, this.fontSize(this.mobile ? 24 : 13, 12), '#587252');
+      } else if (effect.kind === 'paper-contact') {
+        for (let i = 0; i < 8; i++) { const a = i * TAU / 8; this.line([[x + Math.cos(a) * 19, y + Math.sin(a) * 19], [x + Math.cos(a) * (38 + p * 25), y + Math.sin(a) * (38 + p * 25)]], '#bfa16f', 2.3); }
+        this.label('啪！', x + 65, y + 4, this.fontSize(this.mobile ? 30 : 18, 13), '#877355');
+      } else if (effect.kind === 'hammer') {
         c.translate(x + 50, y - 57); c.rotate(this.reducedMotion ? -0.5 : -1.35 + p * 2.05);
         this.rect(-5, -5, 11, 81, 5, '#d7b49a', C.ink, 2); this.rect(-40, -21, 80, 31, 7, '#8eacd0', '#e0edf4', 2); this.line([[-32, -14], [29, -14]], '#d9e2e0', 3);
       } else if (effect.kind === 'handoff') {
@@ -1136,8 +1352,8 @@ export class Universe {
         c.translate(0, -incoming * 34);
         this.rect(-48, -26, 96, 52, 5, '#d4adb31b', '#d7b7b4', 3);
         this.rect(-42, -20, 84, 40, 3, null, '#d7b7b4', 1);
-        this.label('交 班', 0, 9, 28, '#efcec8');
-        if (p > 0.22) this.label('先歇一会儿', 0, 47, 13, C.white);
+        this.label('归 档', 0, 9, 28, '#8c746f');
+        if (p > 0.22) this.label('先歇一会儿', 0, 47, 13, '#556b59');
       } else if (effect.kind === 'fold') {
         const scale = effect.large ? 2.2 : this.mobile ? 1.65 : 1.25;
         this.paperCrane(x, y - p * 58, scale, -0.25 + p * 0.4, C.white);
@@ -1154,7 +1370,7 @@ export class Universe {
         for (let i = 0; i < 4; i++) this.line([[x - 96, y - 80 + i * 6], [x - 33, y - 27 + i * 6], [x + 9, y + 22 + i * 6]], [C.pink, C.gold, C.lime, C.blue][i], 7);
       } else if (effect.kind === 'mute') {
         this.ellipse(x, y, 52 + p * 22, 45 + p * 15, '#a7c3cd35', '#a7c3cda0', 2);
-        this.label('Z z z', x, y + 7, 25, C.blue); this.label('已静音', x, y + 30, 13, C.white);
+        this.label('Z z z', x, y + 7, 25, '#607e80'); this.label('已静音', x, y + 30, 13, '#4c6a60');
       } else if (effect.kind === 'meteor') {
         const t = this.reducedMotion ? 1 : Math.min(1, p * 2.6), mx = x - (1 - t) * 195, my = y - (1 - t) * 220;
         this.line([[mx - 113, my - 122], [mx - 50, my - 54], [mx, my]], '#d9c5a155', 20); this.line([[mx - 75, my - 82], [mx, my]], C.gold, 6);
@@ -1165,10 +1381,10 @@ export class Universe {
       } else if (effect.kind === 'bubbles') {
         for (let i = 0; i < 7; i++) { const xx = x + Math.sin(i * 1.9) * 75, yy = y - p * 112 - i * 13; this.ellipse(xx, yy, 12 + i % 3 * 5, 12 + i % 3 * 5, '#a7c3cd12', '#b3cbd19a', 2); this.ellipse(xx - 4, yy - 5, 3, 2, '#e6fcffb0'); }
       } else if (effect.kind === 'snacks') {
-        this.ellipse(x, y + 12, 50, 16, '#d8e1dd', C.ink, 2); this.ellipse(x - 16, y, 16, 12, C.gold, '#ac749a', 2); this.ellipse(x - 16, y, 6, 4, '#263141', null); this.rect(x + 13, y - 38, 21, 43, 5, '#a7c3cd70', '#b4d1d2', 2); this.line([[x + 21, y - 46], [x + 26, y - 3]], C.pink, 3); this.label('吃点好的', x, y + 50, this.mobile ? 24 : 17, C.white);
+        this.ellipse(x, y + 12, 50, 16, '#d8e1dd', C.ink, 2); this.ellipse(x - 16, y, 16, 12, C.gold, '#ac749a', 2); this.ellipse(x - 16, y, 6, 4, '#263141', null); this.rect(x + 13, y - 38, 21, 43, 5, '#a7c3cd70', '#b4d1d2', 2); this.line([[x + 21, y - 46], [x + 26, y - 3]], C.pink, 3); this.label('吃点好的', x, y + 50, this.mobile ? 24 : 17, '#546f55');
       } else if (effect.kind === 'disco' || effect.kind === 'festival') {
         const texts = ['今天辛苦了', '一起歇一会儿', '这会儿不忙', '好好下班'];
-        this.label(texts[(this.hits - 1 + 4) % 4], x, y - 43 - p * 25, this.mobile ? 29 : 23, C.lime);
+        this.label(texts[(this.hits - 1 + 4) % 4], x, y - 43 - p * 25, this.mobile ? 29 : 23, '#597547');
         for (let i = 0; i < 8; i++) { const a = i / 8 * TAU; this.line([[x + Math.cos(a) * 25, y + Math.sin(a) * 25], [x + Math.cos(a) * (68 + p * 45), y + Math.sin(a) * (68 + p * 45)]], [C.pink, C.blue, C.lime][i % 3], 3); }
       }
       c.restore();
@@ -1200,10 +1416,12 @@ export class Universe {
 
   drawCharge() {
     if (this.charge <= 0) return;
-    const c = this.ctx, g = this.mode === 'earth' ? this.globe : this.point(this.aim.x, this.aim.y);
+    const c = this.ctx;
+    const face = this.persona === 'teacher' && this.mode === 'earth';
+    const g = this.mode === 'earth' ? face ? { x: this.character.faceX, y: this.character.faceY, r: this.character.faceRadius } : this.globe : this.point(this.aim.x, this.aim.y);
     const r = this.mode === 'earth' ? g.r + 21 : 38;
-    this.ellipse(g.x, g.y, r, r, null, '#bac8a125', 4);
-    c.beginPath(); c.arc(g.x, g.y, r, -Math.PI / 2, -Math.PI / 2 + this.charge * TAU); c.strokeStyle = this.charge > 0.8 ? C.gold : C.lime; c.lineWidth = 6; c.stroke();
-    if (this.mode === 'earth') { this.glow(g.x, g.y, g.r * 1.7, `rgba(255,201,123,${this.charge * 0.16})`); this.label(`${Math.round(this.charge * 100)}%`, g.x, g.y + 9, this.mobile ? 43 : 29, C.white); }
+    this.ellipse(g.x, g.y, r, r, null, '#9baf812e', 4);
+    c.beginPath(); c.arc(g.x, g.y, r, -Math.PI / 2, -Math.PI / 2 + this.charge * TAU); c.strokeStyle = this.charge > 0.8 ? '#b79b67' : '#7b9b6d'; c.lineWidth = 6; c.stroke();
+    if (this.mode === 'earth') this.label(`${Math.round(this.charge * 100)}%`, g.x, face ? g.y - r - 40 : g.y + 9, this.mobile ? 43 : 29, '#45634d');
   }
 }

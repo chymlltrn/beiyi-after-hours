@@ -1,0 +1,10 @@
+{
+  "score": 92,
+  "verdict": "pass",
+  "category_match": true,
+  "differences": [
+    "The desktop doctor sorting scene partially covers the hospital door sign; the environment remains named clearly and the door is visible in the other hospital scenes."
+  ],
+  "suggestions": [],
+  "reasoning": "All three roles have visibly distinct workplaces, readable targets and soft colors at desktop and 350 px widths. Teacher paper contact and the 2.6-second paper burst are visible while the photographed character remains intact; the earlier overlapping teacher guidance is removed."
+}

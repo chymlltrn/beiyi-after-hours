@@ -1,5 +1,5 @@
-import { Universe } from './assets/universe.js?v=3';
-import { PERSONAS } from './assets/personas.js?v=3';
+import { Universe } from './assets/universe.js?v=4';
+import { PERSONAS } from './assets/personas.js?v=4';
 
 const $ = (selector) => document.querySelector(selector);
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -162,6 +162,8 @@ function reset({ announce = true } = {}) {
   phase = 'ready'; units = 0; sceneHits = 0; score = 0; combo = 0; bestCombo = 0; lastHitAt = null;
   universe.reset(); universe.setTool(tool); universe.setIntensity(intensity);
   $('#result-panel').hidden = true; $('#result-button').hidden = true;
+  delete $('#game-area').dataset.lastInteraction;
+  delete $('#game-area').dataset.lastTarget;
   $('#impact-text').classList.remove('show'); $('#universe-panel').classList.remove('is-impact');
   $('#scene-caption').textContent = '';
   $('#hit-button').disabled = false; $('#charge-button').disabled = false; $('#destroy-button').disabled = false;
@@ -202,6 +204,18 @@ function setMode(next, { scroll = false } = {}) {
   $('#mode-description').textContent = modes[mode].description;
   $('#mode-instruction').textContent = modes[mode].instruction;
   $('#stage-badge').textContent = modes[mode].badge;
+  const profile = PERSONAS[persona];
+  $('#environment-label').textContent = profile.environmentLabel;
+  $('#environment-description').textContent = profile.backgroundDescription;
+  $('#game-area').dataset.environment = profile.environmentLabel;
+  $('#game-area').dataset.interaction = modes[mode].interaction;
+  $('#interaction-label').textContent = {
+    fling: '抓起道具，拖动后松手',
+    sort: '看清类别，拖进对应纸箱',
+    aim: persona === 'teacher' ? '选个负担，瞄准脸部投过去' : '按住蓄力，松手释放',
+    pet: '直接点鼠鼠，它们会回应你',
+    conveyor: '点传送带上的文书，处理一件少一件',
+  }[modes[mode].interaction];
   $('#universe').setAttribute('aria-label', `${modes[mode].name}。${modes[mode].instruction}。键盘空格或回车也能操作。`);
   document.querySelectorAll('.mode-card[data-mode]').forEach(card => {
     const active = card.dataset.mode === mode;
@@ -231,24 +245,22 @@ function setPersona(next) {
   $('#persona-welcome').textContent = profile.welcome;
   $('#persona-description').textContent = profile.subtitle;
   document.querySelectorAll('.desktop-description, .mobile-description').forEach(text => { text.textContent = profile.heroDescription; });
-  $('[data-start-label]').textContent = { phd: '甩飞一件仪器', doctor: '盖一个交班章', teacher: '放飞一只纸鹤' }[persona];
+  $('[data-start-label]').textContent = { phd: '去实验室玩一会儿', doctor: '把这摞文书退回去', teacher: '把额外任务丢回去' }[persona];
   const art = {
     phd: ['lab', 'mentor', 'earth', 'mice'],
-    doctor: ['paperwork', 'mentor', 'clock', 'tea'],
-    teacher: ['books', 'mentor', 'forms', 'garden'],
+    doctor: ['grant', 'inspection', 'drg', 'forms'],
+    teacher: ['books', 'burden', 'school', 'burden'],
   }[persona];
-  const methods = {
-    phd: ['甩飞仪器', '放下消息', '蓄力释放', '跟着节拍'],
-    doctor: ['盖章交班', '暂停通知', '拆开排班', '喝杯热茶'],
-    teacher: ['放飞纸鹤', '收起通知', '拆开表格', '听见下课'],
-  }[persona];
+  $('#ticket-art').setAttribute('href', `#art-${{ phd: 'lab', doctor: 'doctor', teacher: 'school' }[persona]}`);
+  $('#brand-art').setAttribute('href', `#${{ phd: 'i-mouse', doctor: 'art-doctor', teacher: 'art-school' }[persona]}`);
+  $('#closing-art').setAttribute('href', `#art-${{ phd: 'mice', doctor: 'drg', teacher: 'school' }[persona]}`);
   document.querySelectorAll('.mode-card[data-mode]').forEach((card, index) => {
     const scene = modes[card.dataset.mode];
     card.querySelector('.desktop-title').textContent = scene.cardTitle;
     const short = card.querySelector('.mobile-title');
     short.replaceChildren(document.createTextNode(scene.cardShort[0]), document.createElement('br'), document.createTextNode(scene.cardShort[1]));
     card.querySelector('p').textContent = scene.cardDescription;
-    card.querySelector('.card-number').textContent = `${scene.number} / ${methods[index]}`;
+    card.querySelector('.card-number').textContent = `${scene.number} / ${scene.methodLabel}`;
     card.querySelector('.card-art use').setAttribute('href', `#art-${art[index]}`);
   });
   document.querySelectorAll('[data-prompt]').forEach((button, index) => {
@@ -262,35 +274,48 @@ function setPersona(next) {
 
 function releaseWords() {
   const words = {
-    phd: ['仪器先下班。', '消息先放下。', '这一刻，没有截止日期。', '鼠鼠都来啦。'],
-    doctor: ['这一叠，交班了。', '提醒先歇一会儿。', '排班表，散开吧。', '热茶和点心都到啦。'],
-    teacher: ['纸鹤，飞远一点。', '通知先收起来。', '表格，散开吧。', '下课铃响啦。'],
+    phd: ['实验台，今天先到这里。', '导师消息，明天再看。', '截止日，暂时炸开吧。', '鼠鼠和博士一起下班。'],
+    doctor: ['标书、检查、DRG，各回各箱。', '这些行政提醒，先退回。', 'DRG文书堆，散开吧。', '这条文书传送带，停工啦。'],
+    teacher: ['额外任务，先离开备课桌。', '不用什么都让老师来。', '这些额外负担，投回去！', '报表和打卡，请自己接好。'],
   };
   return words[persona][Object.keys(modes).indexOf(mode)];
 }
 
 function hit(x = .5, y = .5, options = {}) {
   if (phase === 'complete') reset({ announce: false });
-  if (phase !== 'ready') return;
+  if (phase !== 'ready') return false;
   const now = performance.now();
   const interval = lastHitAt === null ? Infinity : now - lastHitAt;
-  const onBeat = mode === 'mice' && Math.abs(interval - 450) < 150;
-  combo = interval < 1250 ? combo + 1 : 1; bestCombo = Math.max(bestCombo, combo); lastHitAt = now;
+  const onBeat = persona === 'phd' && mode === 'mice' && Math.abs(interval - 450) < 150;
+  const nextCombo = interval < 1250 ? combo + 1 : 1;
+  const proposedGain = mode === 'earth' ? Math.round(8 + (options.charge || 0) * 42) : onBeat ? 2 : 1;
+  const feedback = universe.hit(x, y, { ...options, tool, combo: nextCombo, gain: proposedGain, intensity });
+  $('#game-area').dataset.lastInteraction = feedback?.interaction || modes[mode].interaction;
+  if (feedback?.targetId !== undefined) $('#game-area').dataset.lastTarget = String(feedback.targetId);
+  else delete $('#game-area').dataset.lastTarget;
+  if (feedback?.applied === false) {
+    if (feedback.message) $('#scene-caption').textContent = feedback.message;
+    if (feedback.impact) impact(feedback.impact);
+    if (['mouse-pet', 'researcher-rest', 'mentor-pause'].includes(feedback.interaction)) { releases++; tone('hit', .3); }
+    updateProgress();
+    return false;
+  }
+  combo = nextCombo; bestCombo = Math.max(bestCombo, combo); lastHitAt = now;
   clearTimeout(comboTimer);
   comboTimer = setTimeout(() => { combo = 0; updateProgress(); }, 1400);
   releases++; sceneHits++;
-  const gain = mode === 'earth' ? Math.round(8 + (options.charge || 0) * 42) : mode === 'mice' && onBeat ? 2 : 1;
+  const gain = onBeat ? proposedGain : (feedback?.gain ?? proposedGain);
   units = Math.min(modes[mode].goal, units + gain);
   const earned = modes[mode].score * (1 + Math.min(combo - 1, 7) * .15) * (options.fling ? 1.5 : 1) * (onBeat ? 2 : 1);
   score += Math.round(earned);
-  universe.hit(x, y, { ...options, tool, combo, gain, intensity });
   tone('hit', 1 + Math.min(combo, 5) * .1);
-  const message = modes[mode].hits[(sceneHits - 1) % modes[mode].hits.length];
+  const message = feedback?.message || modes[mode].hits[(sceneHits - 1) % modes[mode].hits.length];
   $('#scene-caption').textContent = message;
   const punches = { hammer: releaseWords(), gravity: '轻飘飘地飞走了。', rainbow: '心情添了一点颜色。', shred: '这一条，先放下。', mute: '安静了一点。', reply: '留一点时间给自己。', meteor: '裂开一道缝啦。', laser: '这一块，松开了。', blackhole: '慢慢散开。', disco: '跟上节拍啦。', bubbles: '咕噜，冒个泡。', snacks: '给自己一点甜。' };
-  impact(onBeat ? '合拍！ ×2' : options.fling ? `甩得漂亮！ +${Math.round(earned)}` : combo >= 3 ? `${combo} 连击 · 轻一点了！` : punches[tool]);
+  impact(onBeat ? '合拍！ ×2' : feedback?.impact || (options.fling ? `甩得漂亮！ +${Math.round(earned)}` : combo >= 3 ? `${combo} 连击 · 轻一点了！` : punches[tool]));
   updateProgress();
   if (units >= modes[mode].goal) destroy({ automatic: true, power: options.charge || 1 });
+  return true;
 }
 
 function destroy({ automatic = false, power = 1 } = {}) {
@@ -339,8 +364,10 @@ function releaseCharge(source, owner) {
   if (!charging || charging.source !== source || charging.owner !== owner) return;
   const amount = charge; const { x, y } = charging.position;
   cancelCharge();
-  if (amount >= .95) destroy({ power: 1 });
-  else hit(x, y, { charge: amount });
+  if (amount >= .95) {
+    if (source !== 'canvas' || hit(x, y, { charge: amount })) destroy({ power: 1 });
+  }
+  else hit(x, y, { charge: amount, autoTarget: source !== 'canvas' });
 }
 
 function position(event) {
@@ -362,6 +389,7 @@ $('#universe').addEventListener('pointermove', event => {
   const p = position(event); universe.pointer(p.x, p.y);
   if (!gesture || gesture.id !== event.pointerId) return;
   gesture.x = p.x; gesture.y = p.y;
+  if (charging?.source === 'canvas' && charging.owner === event.pointerId) charging.position = p;
   universe.setGesture({ ...gesture, active: true, charge });
 });
 $('#universe').addEventListener('pointerup', event => {
@@ -370,8 +398,14 @@ $('#universe').addEventListener('pointerup', event => {
   const distance = Math.hypot(event.clientX - g.clientX, event.clientY - g.clientY);
   gesture = null; universe.setGesture({ active: false });
   if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
-  if (mode === 'earth') releaseCharge('canvas', event.pointerId);
-  else hit(g.startX, g.startY, distance > 35 && (mode === 'lab' || mode === 'mentor') ? { fling: { dx: p.x - g.startX, dy: p.y - g.startY }, endX: p.x, endY: p.y } : {});
+  if (mode === 'earth') {
+    if (charging?.source === 'canvas' && charging.owner === event.pointerId) charging.position = p;
+    releaseCharge('canvas', event.pointerId);
+  }
+  else {
+    const throwing = distance > 35 && (mode === 'lab' || mode === 'mentor' || modes[mode].interaction === 'aim');
+    hit(g.startX, g.startY, throwing ? { fling: { dx: p.x - g.startX, dy: p.y - g.startY }, endX: p.x, endY: p.y } : {});
+  }
 });
 $('#universe').addEventListener('pointercancel', event => { if (gesture?.id === event.pointerId) cancelGesture(); });
 $('#universe').addEventListener('lostpointercapture', event => { if (gesture?.id === event.pointerId) cancelGesture(); });
@@ -379,7 +413,7 @@ $('#universe').addEventListener('keydown', event => {
   if (!['Space', 'Enter'].includes(event.code)) return;
   event.preventDefault(); if (event.repeat) return;
   if (charging || gesture) return;
-  if (mode === 'earth') beginCharge('keyboard', undefined, event.code); else hit();
+  if (mode === 'earth') beginCharge('keyboard', undefined, event.code); else hit(.5, .5, { autoTarget: true });
 });
 $('#universe').addEventListener('keyup', event => {
   if (['Space', 'Enter'].includes(event.code) && charging?.source === 'keyboard') { event.preventDefault(); releaseCharge('keyboard', event.code); }
@@ -400,10 +434,10 @@ $('#charge-button').addEventListener('keydown', event => { if (['Space', 'Enter'
 $('#charge-button').addEventListener('keyup', event => { if (['Space', 'Enter'].includes(event.code) && charging?.source === 'charge-keyboard') { event.preventDefault(); releaseCharge('charge-keyboard', event.code); } });
 $('#charge-button').addEventListener('blur', () => { if (charging?.source === 'charge-keyboard') cancelCharge(); });
 // Assistive technology can activate the button without pointer or keyboard events.
-$('#charge-button').addEventListener('click', event => { if (event.detail === 0 && !charging && phase !== 'burst') hit(.5, .5, { charge: .5 }); });
+$('#charge-button').addEventListener('click', event => { if (event.detail === 0 && !charging && phase !== 'burst') hit(.5, .5, { charge: .5, autoTarget: true }); });
 $('#hit-button').addEventListener('click', () => {
   if (phase === 'complete') reset({ announce: false });
-  else hit(.25 + Math.random() * .5, .35 + Math.random() * .3);
+  else hit(.5, .5, { autoTarget: true });
 });
 $('#destroy-button').addEventListener('click', () => destroy());
 $('#reset-button').addEventListener('click', () => reset());

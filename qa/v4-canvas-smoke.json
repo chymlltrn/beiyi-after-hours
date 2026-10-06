@@ -1,0 +1,287 @@
+{
+  "result": {
+    "out": [
+      {
+        "role": "phd",
+        "mode": "lab",
+        "environment": "laboratory",
+        "targetCount": 8,
+        "asset": "ready",
+        "hit": {
+          "applied": true,
+          "gain": 1,
+          "interaction": "instrument-hit",
+          "targetId": 0
+        },
+        "fragments": 9
+      },
+      {
+        "role": "phd",
+        "mode": "mentor",
+        "environment": "laboratory",
+        "targetCount": 7,
+        "asset": "ready",
+        "hit": {
+          "applied": true,
+          "gain": 1,
+          "interaction": "notification-clear",
+          "targetId": 0
+        },
+        "fragments": 0
+      },
+      {
+        "role": "phd",
+        "mode": "earth",
+        "environment": "laboratory",
+        "targetCount": 1,
+        "asset": "ready",
+        "hit": {
+          "applied": true,
+          "interaction": "ddl-hit",
+          "targetId": 0
+        },
+        "fragments": 0
+      },
+      {
+        "role": "phd",
+        "mode": "mice",
+        "environment": "laboratory",
+        "targetCount": 5,
+        "asset": "ready",
+        "hit": {
+          "applied": true,
+          "gain": 2,
+          "message": "鼠鼠收到啦，开心得晃起了耳朵。",
+          "impact": "鼠鼠也松了一口气",
+          "interaction": "mouse-dance",
+          "targetId": 0
+        },
+        "fragments": 0
+      },
+      {
+        "role": "doctor",
+        "mode": "lab",
+        "environment": "hospital",
+        "targetCount": 6,
+        "asset": "ready",
+        "hit": {
+          "applied": true,
+          "gain": 1,
+          "message": "基金标书，归好了。",
+          "impact": "标书 · 已归档",
+          "interaction": "sort-correct",
+          "targetId": 0
+        },
+        "fragments": 0
+      },
+      {
+        "role": "doctor",
+        "mode": "mentor",
+        "environment": "hospital",
+        "targetCount": 5,
+        "asset": "ready",
+        "hit": {
+          "applied": true,
+          "gain": 1,
+          "interaction": "notification-clear",
+          "targetId": 0
+        },
+        "fragments": 0
+      },
+      {
+        "role": "doctor",
+        "mode": "earth",
+        "environment": "hospital",
+        "targetCount": 1,
+        "asset": "ready",
+        "hit": {
+          "applied": true,
+          "interaction": "drg-break",
+          "targetId": 0
+        },
+        "fragments": 0
+      },
+      {
+        "role": "doctor",
+        "mode": "mice",
+        "environment": "hospital",
+        "targetCount": 3,
+        "asset": "ready",
+        "hit": {
+          "applied": true,
+          "gain": 1,
+          "message": "标书排版，收下了。队列又短了一点。",
+          "impact": "收走一件行政任务",
+          "interaction": "admin-queue-clear",
+          "targetId": 0
+        },
+        "fragments": 0
+      },
+      {
+        "role": "teacher",
+        "mode": "lab",
+        "environment": "school",
+        "targetCount": 6,
+        "asset": "ready",
+        "hit": {
+          "applied": true,
+          "gain": 1,
+          "message": "这件额外任务，送回发任务的人。",
+          "impact": "额外任务，退回！",
+          "interaction": "burden-return",
+          "targetId": 0
+        },
+        "fragments": 0
+      },
+      {
+        "role": "teacher",
+        "mode": "mentor",
+        "environment": "school",
+        "targetCount": 5,
+        "asset": "ready",
+        "hit": {
+          "applied": true,
+          "gain": 1,
+          "message": "「非教学报表再报一次」退回给发任务的人。",
+          "impact": "额外通知，退回！",
+          "interaction": "notification-face",
+          "targetId": 0
+        },
+        "fragments": 0
+      },
+      {
+        "role": "teacher",
+        "mode": "earth",
+        "environment": "school",
+        "targetCount": 1,
+        "asset": "ready",
+        "hit": {
+          "applied": true,
+          "message": "「非教学报表」送回了发任务的人。",
+          "impact": "非教学报表 · 退回！",
+          "interaction": "paper-face",
+          "targetId": 0
+        },
+        "fragments": 0
+      },
+      {
+        "role": "teacher",
+        "mode": "mice",
+        "environment": "school",
+        "targetCount": 1,
+        "asset": "ready",
+        "hit": {
+          "applied": true,
+          "gain": 1,
+          "message": "「非教学报表」送回了发任务的人。",
+          "impact": "非教学报表 · 退回！",
+          "interaction": "paper-face",
+          "targetId": 0
+        },
+        "fragments": 0
+      }
+    ],
+    "wrongHit": {
+      "applied": false,
+      "gain": 0,
+      "message": "这份基金标书归「标书」，拖进去就好。",
+      "impact": "再分一次就好",
+      "interaction": "sort-wrong",
+      "targetId": 0
+    },
+    "correctHit": {
+      "applied": true,
+      "gain": 1,
+      "message": "基金标书，归好了。",
+      "impact": "标书 · 已归档",
+      "interaction": "sort-correct",
+      "targetId": 0
+    },
+    "mouseHit": {
+      "applied": false,
+      "gain": 0,
+      "message": "鼠鼠蹭了蹭你的手。先陪它歇一会儿。",
+      "impact": "鼠鼠也松了一口气",
+      "interaction": "mouse-pet",
+      "targetId": 99
+    },
+    "researchHit": {
+      "applied": false,
+      "gain": 0,
+      "message": "博士生把肩膀放下来，喝了口水。今天已经很努力了。",
+      "impact": "博士生也休息一下",
+      "interaction": "researcher-rest",
+      "targetId": 98
+    },
+    "teacher": {
+      "stickers": 1,
+      "flights": 0,
+      "fragments": 0,
+      "imageLoaded": "ready"
+    },
+    "releaseMiss": {
+      "applied": false,
+      "gain": 0,
+      "message": "对准拿着话筒的人，把额外任务送回去。",
+      "interaction": "paper-miss"
+    },
+    "releaseHit": {
+      "applied": true,
+      "message": "「迎检材料」送回了发任务的人。",
+      "impact": "迎检材料 · 退回！",
+      "interaction": "paper-face",
+      "targetId": 0
+    },
+    "headHits": [
+      {
+        "width": 1250,
+        "mode": "lab",
+        "hit": {
+          "applied": false,
+          "gain": 0,
+          "message": "博士生把肩膀放下来，喝了口水。今天已经很努力了。",
+          "impact": "博士生也休息一下",
+          "interaction": "researcher-rest",
+          "targetId": 98
+        }
+      },
+      {
+        "width": 1250,
+        "mode": "mice",
+        "hit": {
+          "applied": false,
+          "gain": 0,
+          "message": "博士生把肩膀放下来，喝了口水。今天已经很努力了。",
+          "impact": "博士生也休息一下",
+          "interaction": "researcher-rest",
+          "targetId": 98
+        }
+      },
+      {
+        "width": 350,
+        "mode": "lab",
+        "hit": {
+          "applied": false,
+          "gain": 0,
+          "message": "博士生把肩膀放下来，喝了口水。今天已经很努力了。",
+          "impact": "博士生也休息一下",
+          "interaction": "researcher-rest",
+          "targetId": 98
+        }
+      },
+      {
+        "width": 350,
+        "mode": "mice",
+        "hit": {
+          "applied": false,
+          "gain": 0,
+          "message": "博士生把肩膀放下来，喝了口水。今天已经很努力了。",
+          "impact": "博士生也休息一下",
+          "interaction": "researcher-rest",
+          "targetId": 98
+        }
+      }
+    ]
+  },
+  "errors": []
+}

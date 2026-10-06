@@ -1,0 +1,33 @@
+{
+  "source_reference": "user supplied reference photograph: codex-clipboard-cf84d366-185a-48cf-ba0e-3cd82441cf9e.jpg",
+  "tool": "built-in image_gen.imagegen",
+  "destination": "assets/teacher-character.png",
+  "generated_source": "/Users/hhp/.codex/generated_images/01a10f46-78fc-72e3-aa64-3f20400e181d/exec-6ca8dd07-6f99-4bea-9f73-4c189af5c23d.png",
+  "width": 1024,
+  "height": 1536,
+  "alpha": true,
+  "alpha_range": [
+    0,
+    254
+  ],
+  "transparent_corner_alpha": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "transparent_pixels": 599738,
+  "inspection": "Inspected using view_image. Recognizable face, short black hair, light striped shirt, microphone and pink notes; waist-up composition with no text or injury. Original alpha preserved with direct file copy.",
+  "face_target_normalized": {
+    "x": 0.495,
+    "y": 0.215,
+    "radius_x": 0.16,
+    "radius_y": 0.125
+  },
+  "eyes_normalized": {
+    "x": 0.46,
+    "y": 0.18
+  },
+  "initial_prompt": "Use case: illustration-story.\nAsset type: transparent PNG character sprite for a gentle school stress-relief browser game.\nInput image 1 is a reference photograph for the man's face, haircut, outfit, and handheld props. Make one recognizable illustrated character based on this man.\nPrimary request: a softly comic, neutral and slightly bemused adult male speaker, facing mostly forward, shown from head to knees, standing upright. Preserve his short black hair, round broad face, subtle squint, gray-white fine striped short-sleeve collared shirt, dark trousers, a silver and black microphone in one hand and folded pink speech notes in the other. Keep face large and clear; face must not be covered by microphone or papers. Allow the hands and props to sit below the chin. The facial expression should be calm and gently funny, with no fear, injury or exaggerated humiliation.\nStyle/medium: refined friendly editorial cartoon illustration with smooth warm brown outlines, subtle soft paper-like shading and clean edges. Gentle cream, mist blue, muted pink and charcoal palette. Moderately enlarged head, not a caricature with distorted facial features.\nComposition/framing: one isolated character centered, fully visible head and both shoulders and both hands, cropped just below the knees, comfortable transparent margins, no other people. Straight-on view suitable for overlaying paper ball animations in a Canvas game. Hair top around 8% of image height, face center around 23% image height, character width around 60% image width. Keep the silhouette and clothing visually easy to distinguish at a small game size.\nScene/backdrop: completely transparent background, genuine alpha transparency, no floor, no backdrop, no scenery, no frame.\nText: none.\nConstraints: preserve resemblance to the reference person and the gray-white striped shirt, dark trousers, microphone and pink notes. No lettering on notes or shirt. No wounds, blood, violence, impacts, flying objects, text, logos or watermark. Character only; animations will be implemented separately in code.",
+  "final_prompt": "Use case: identity-preserve.\nAsset type: transparent half-body character sprite for a browser game.\nInput image 1 is the edit target: preserve this illustrated man's exact recognizable face, hair, gray-white pinstriped short-sleeve collared shirt, microphone, pink folded notes, and soft illustration style.\nChange only framing and background cleanup: create a waist-up portrait (head through belt), with the character much larger in the image. The entire head, both shoulders, both elbows, both hands, microphone and pink folded notes must be visible. Omit all legs and shoes. Face center should be at roughly 50% width and 23% height, hair top at 5% height; head occupies about 30% image width. Keep shoulders comfortably inside 85% image width. Keep the microphone below the mouth and neither paper nor microphone covers eyes, nose or facial expression.\nGenuine fully transparent alpha background. No backdrop, floor, glow, shadow halo, black gradient, scenery, frame, text or watermark. Crisp clean silhouette edge. Character only. Keep neutral and slightly bemused expression, no injuries, no impacts, no flying objects. Cream and mist blue gentle palette."
+}
